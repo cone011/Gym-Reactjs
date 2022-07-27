@@ -13,14 +13,14 @@ export async function GetAllAlumno() {
   for (const key in data) {
     const objectAlumno = {
       id: key,
-      ...data,
+      ...data[key],
     };
     transformedData.push(objectAlumno);
   }
   return transformedData;
 }
 
-export async function getSingleAlumn(IdAlumno) {
+export async function getSingleAlumno(IdAlumno) {
   const response = await fetch(`${CALL_API_ROUTE}/Alumno/${IdAlumno}`);
   const data = await response.json();
 
