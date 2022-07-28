@@ -5,6 +5,7 @@ import Sidebar from "./components/UI/SideBar/SideBar";
 import Navbar from "./components/UI/NavBar/NavBar";
 import { Route, Switch } from "react-router-dom";
 import Membership from "./components/Membership/Membership";
+import Service from "./components/Services/Services";
 function App() {
   const [isopen, setisopen] = useState(false);
   const toggle = () => {
@@ -17,6 +18,9 @@ function App() {
       <Switch>
         <Route path="/membership" exact>
           <Membership />
+        </Route>
+        <Route path="/services" exact>
+          <Service />
         </Route>
       </Switch>
     </>
