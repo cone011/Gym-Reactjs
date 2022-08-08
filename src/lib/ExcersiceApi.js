@@ -36,7 +36,9 @@ export async function getSingleExcersice(IdEjercicio) {
 }
 
 export async function deleteExcersice(IdEjercicio) {
-  const response = await fetch(`${CALL_API_ROUTE}/Ejercicio/${IdEjercicio}`);
+  const response = await fetch(`${CALL_API_ROUTE}/Ejercicio/${IdEjercicio}`, {
+    method: "DELETE",
+  });
   const data = await response.json();
 
   if (!response.ok) {
