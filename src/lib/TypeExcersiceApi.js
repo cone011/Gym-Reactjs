@@ -53,7 +53,14 @@ export async function SaveTypeExcersice(
     callApi = `${callApi}/${IdTipoEjercicio}`;
   }
 
-  const response = await fetch(`${callApi}`, { method: method });
+  const response = await fetch(`${callApi}`, {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+    body: {
+      Codigo: Codigo,
+      Descripcion: Descripcion,
+    },
+  });
 
   const data = await response.json();
 
