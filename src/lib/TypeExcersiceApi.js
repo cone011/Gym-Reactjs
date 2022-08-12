@@ -11,10 +11,10 @@ export async function GetAllTypeExcersice() {
 
   const transformedData = [];
 
-  for (const key in data) {
+  for (const key in data.posts) {
     const typeExcersiceObject = {
       IdTipoEjercicio: key,
-      ...data[key],
+      ...data.posts[key],
     };
     transformedData.push(typeExcersiceObject);
   }

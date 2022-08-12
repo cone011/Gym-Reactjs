@@ -10,13 +10,15 @@ export async function getAllExcersice() {
 
   const transformedData = [];
 
-  for (const key in data) {
+  for (const key in data.result) {
     const objectExcersice = {
       IdEjercicio: key,
-      ...data[key],
+      ...data.result[key],
     };
     transformedData.push(objectExcersice);
   }
+
+  return transformedData;
 }
 
 export async function getSingleExcersice(IdEjercicio) {

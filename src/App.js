@@ -1,29 +1,13 @@
-import logo from "./logo.svg";
-import React, { useState } from "react";
+import React from "react";
 import "./App.css";
-import Sidebar from "./components/UI/SideBar/SideBar";
-import Navbar from "./components/UI/NavBar/NavBar";
-import { Route, Switch } from "react-router-dom";
-import Membership from "./components/Membership/Membership";
-import Service from "./components/Services/Services";
+import "devextreme/dist/css/dx.light.css";
+import Routes from "./pages/Routes/Routes";
+import Layout from "./components/Layout/Layout";
 function App() {
-  const [isopen, setisopen] = useState(false);
-  const toggle = () => {
-    setisopen(!isopen);
-  };
   return (
-    <>
-      <Navbar toggle={toggle} />
-      <Sidebar isopen={isopen} toggle={toggle} />
-      <Switch>
-        <Route path="/membership" exact>
-          <Membership />
-        </Route>
-        <Route path="/services" exact>
-          <Service />
-        </Route>
-      </Switch>
-    </>
+    <Layout>
+      <Routes />
+    </Layout>
     /*<div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
