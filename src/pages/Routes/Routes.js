@@ -2,7 +2,7 @@ import { Route, Switch } from "react-router-dom";
 import AllExcersice from "../Excersice/AllExcersice";
 import Membership from "../../components/Membership/Membership";
 import Service from "../../components/Services/Services";
-import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
+import AllTypeExcersice from "../../components/TypeExcersice/TypeExcersiceList/TypeExcersiceList";
 const Routes = () => {
   return (
     <Switch>

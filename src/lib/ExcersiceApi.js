@@ -55,11 +55,11 @@ export async function saveExcersice(
   const response = await fetch(`${callApi}`, {
     method: method,
     headers: { "Content-Type": "application/json" },
-    body: {
+    body: JSON.stringify({
       Codigo: Codigo,
       Descripcion: Descripcion,
-      IdEjercicio: IdEjercicio,
-    },
+      IdTipoEjercicio: IdTipoEjercicio,
+    }),
   });
 
   const data = await response.json();

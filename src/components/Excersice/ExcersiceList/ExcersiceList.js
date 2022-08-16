@@ -6,7 +6,7 @@ import DataGrid, {
   HeaderFilter,
   FilterRow,
 } from "devextreme-react/data-grid";
-import Card from "../UI/Card/Card";
+import Card from "../../UI/Card/Card";
 
 const ExcersiceList = (props) => {
   return (
