@@ -1,16 +1,19 @@
-import { Route, Switch } from "react-router-dom";
+import { Route, Switch, Redirect } from "react-router-dom";
 import AllExcersice from "../Excersice/AllExcersice";
 import Membership from "../../components/Membership/Membership";
-import Service from "../../components/Services/Services";
+import Home from "../Home/Home";
 import AllTypeExcersice from "../../components/TypeExcersice/TypeExcersiceList/TypeExcersiceList";
 const Routes = () => {
   return (
     <Switch>
+      <Route path="/" exact>
+        <Redirect to="/home" />
+      </Route>
       <Route path="/membership" exact>
         <Membership />
       </Route>
-      <Route path="/services" exact>
-        <Service />
+      <Route path="/home" exact>
+        <Home />
       </Route>
       <Route path="/type-excersice" exact>
         <AllTypeExcersice />

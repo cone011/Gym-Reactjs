@@ -7,9 +7,17 @@ const TypeExcersiceForm = (props) => {
 
   const typeExcersiceSubmitHandler = (event) => {
     event.preventDefault();
-
+    let IdTipoEjercicio;
     const code = codeInputForm.current.value;
     const description = descriptionInputForm.current.value;
+    if (IdTipoEjercicio !== undefined) {
+      IdTipoEjercicio = props.IdTipoEjercicio;
+    }
+    props.onSaveTypeExcersice({
+      Codigo: code,
+      Descripcion: description,
+      IdTipoEjercicio: IdTipoEjercicio,
+    });
   };
 
   return (
@@ -36,7 +44,7 @@ const TypeExcersiceForm = (props) => {
         <div className={classes.control}>
           <div className={classes.actions}>
             <button type="submit" className={classes.toggle}>
-              guardar
+              Guardar
             </button>
           </div>
         </div>

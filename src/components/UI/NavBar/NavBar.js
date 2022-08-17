@@ -1,32 +1,37 @@
-import React from "react";
-import classes from "./NavBar.module.css";
-import navbarItems from "../../data/NavbarItems";
-import { Link } from "react-router-dom";
-import { FaBars } from "react-icons/fa";
-import { CgGym } from "react-icons/cg";
-const Navbar = ({ toggle }) => {
+import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import classes from "./Navbar.module.css";
+
+const NavbarUI = (props) => {
   return (
-    <nav>
-      <Link to="/" className={classes.link}>
-        <div className={classes.mobilMenuIcon}>
-          <CgGym onClick={toggle} />
-        </div>
-        Gym ReactApp
-      </Link>
-      <div className={classes.menuItems}>
-        {navbarItems.map((item, index) => (
-          <Link className={classes.link} to={item.link} key={index}>
-            {item.title}
-          </Link>
-        ))}
-      </div>
-      <div className={classes.icon}>
-        <div className={classes.mobilMenuIcon}>
-          <FaBars onClick={toggle} />
-        </div>
-      </div>
-    </nav>
+    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
+      <Container>
+        <Navbar.Brand href="/">Inicio</Navbar.Brand>
+        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+        <Navbar.Collapse id="responsive-navbar-nav">
+          <Nav className="me-auto">
+            {/*<Nav.Link href="/campaings">Campañas</Nav.Link>
+            <Nav.Link href="/task">Tareas</Nav.Link>*/}
+          </Nav>
+          <Nav>
+            <Nav.Link href="/campaigns">Campañas</Nav.Link>
+            <Nav.Link href="/task">Tareas</Nav.Link>
+            <Nav.Link href="/list">Listas</Nav.Link>
+            <NavDropdown title="Buscar" id="collasible-nav-dropdown">
+              <NavDropdown.Item href="/search/input">
+                Buscar Listas
+              </NavDropdown.Item>
+              <NavDropdown.Item href="/search/email">
+                Buscar Email
+              </NavDropdown.Item>
+              <NavDropdown.Item href="/search-date">
+                Rango de Fecha Campañas
+              </NavDropdown.Item>
+            </NavDropdown>
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
 };
 
-export default Navbar;
+export default NavbarUI;

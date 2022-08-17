@@ -2,8 +2,7 @@ import { useEffect } from "react";
 import useHttp from "../../hook/use-http";
 import LoadingSpinner from "../../components/UI/LoadingSpinner/LoadingSpinner";
 import { getAllExcersice } from "../../lib/ExcersiceApi";
-import ExcersiceList from "../../components/Excersice/ExcersiceList";
-
+import ExcersiceList from "../../components/Excersice/ExcersiceList/ExcersiceList";
 const AllExcersice = () => {
   const {
     sendRequest,
