@@ -1,22 +1,34 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import classes from "./TypeExcersiceForm.module.css";
 
 const TypeExcersiceForm = (props) => {
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
 
+  const assigmentsValues = () => {
+    if (!props.esNuevo) {
+      codeInputForm.current.value = props.typeExcersiceObject.Codigo;
+      descriptionInputForm.current.value = props.typeExcersiceObject.Nombre;
+    }
+  };
+
+  useEffect(() => {
+    assigmentsValues();
+  }, [assigmentsValues]);
+
   const typeExcersiceSubmitHandler = (event) => {
     event.preventDefault();
-    let IdTipoEjercicio;
+    let IdTipoEjercicio = null;
+    if (!props.esNuevo) {
+      IdTipoEjercicio = props.typeExcersiceObject.IdTipoEjercicio;
+    }
     const code = codeInputForm.current.value;
     const description = descriptionInputForm.current.value;
-    if (IdTipoEjercicio !== undefined) {
-      IdTipoEjercicio = props.IdTipoEjercicio;
-    }
     props.onSaveTypeExcersice({
       Codigo: code,
       Descripcion: description,
       IdTipoEjercicio: IdTipoEjercicio,
+      esNuevo: props.esNuevo,
     });
   };
 

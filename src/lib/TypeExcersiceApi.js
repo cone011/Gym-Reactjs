@@ -9,6 +9,8 @@ export async function GetAllTypeExcersice() {
     throw new Error("No se encontro datos sobre los tipos de ejercicio");
   }
 
+  console.log(data);
+
   const transformedData = [];
 
   for (const key in data.posts) {
@@ -18,6 +20,7 @@ export async function GetAllTypeExcersice() {
     };
     transformedData.push(typeExcersiceObject);
   }
+  console.log(transformedData);
   return transformedData;
 }
 
@@ -39,26 +42,21 @@ export async function GetTypeExcersiceById(IdTipoEjercicio) {
   return typeExcersiceObject;
 }
 
-export async function SaveTypeExcersice(
-  esNuevo,
-  Codigo,
-  Descripcion,
-  IdTipoEjercicio
-) {
+export async function SaveTypeExcersice(typeExcersiceData) {
   let method = "POST";
-  let callApi = `${CALL_API_ROUTE}/TipoEjericicio`;
+  let callApi = `${CALL_API_ROUTE}/TipoEjercicio`;
 
-  if (!esNuevo) {
+  if (!typeExcersiceData.esNuevo) {
     method = "PUT";
-    callApi = `${callApi}/${IdTipoEjercicio}`;
+    callApi = `${callApi}/${typeExcersiceData.IdTipoEjercicio}`;
   }
 
   const response = await fetch(`${callApi}`, {
     method: method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      Codigo: Codigo,
-      Descripcion: Descripcion,
+      Codigo: typeExcersiceData.Codigo,
+      Nombre: typeExcersiceData.Descripcion,
     }),
   });
 
@@ -69,7 +67,6 @@ export async function SaveTypeExcersice(
   }
 
   const typeExcersiceObject = {
-    IdTipoEjercicio: IdTipoEjercicio,
     ...data,
   };
   return typeExcersiceObject;
