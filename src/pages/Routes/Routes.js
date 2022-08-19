@@ -2,8 +2,9 @@ import { Route, Switch, Redirect } from "react-router-dom";
 import AllExcersice from "../Excersice/AllExcersice";
 import Membership from "../../components/Membership/Membership";
 import Home from "../Home/Home";
-import AllTypeExcersice from "../../components/TypeExcersice/TypeExcersiceList/TypeExcersiceList";
+import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
 import TypeExcersiceFormPage from "../TypeExcersice/TypeExcersiceFormPage";
+import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
 const Routes = () => {
   return (
     <Switch>
@@ -23,9 +24,15 @@ const Routes = () => {
         <AllExcersice />
       </Route>
       <Route path="/new-excersice" exact>
-        <TypeExcersiceFormPage />
+        <ExcersiceFormPage />
       </Route>
       <Route path="/edit-excersice" exact>
+        <ExcersiceFormPage />
+      </Route>
+      <Route path="/new-type-excersice" exact>
+        <TypeExcersiceFormPage />
+      </Route>
+      <Route path="/edit-type-excersice" exact>
         <TypeExcersiceFormPage />
       </Route>
     </Switch>

@@ -37,28 +37,22 @@ export async function getSingleExcersice(IdEjercicio) {
   return objectExcersice;
 }
 
-export async function saveExcersice(
-  esNuevo,
-  Codigo,
-  Descripcion,
-  IdTipoEjercicio,
-  IdEjercicio
-) {
+export async function saveExcersice(excersiceData) {
   let method = "POST";
   let callApi = `${CALL_API_ROUTE}/Ejercicio`;
 
-  if (!esNuevo) {
+  if (!excersiceData.esNuevo) {
     method = "PUT";
-    callApi = `${callApi}/${IdEjercicio}`;
+    callApi = `${callApi}/${excersiceData.IdEjercicio}`;
   }
 
   const response = await fetch(`${callApi}`, {
     method: method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      Codigo: Codigo,
-      Descripcion: Descripcion,
-      IdTipoEjercicio: IdTipoEjercicio,
+      Codigo: excersiceData.Codigo,
+      Nombre: excersiceData.Nombre,
+      IdTipoEjercicio: excersiceData.IdTipoEjercicio,
     }),
   });
 
@@ -69,7 +63,6 @@ export async function saveExcersice(
   }
 
   const excersiceObject = {
-    IdEjercicio: IdEjercicio,
     ...data,
   };
   return excersiceObject;

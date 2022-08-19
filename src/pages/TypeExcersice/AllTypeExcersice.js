@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import TypeExcersiceList from "../../components/TypeExcersice/TypeExcersiceList";
 import useHttp from "../../hook/use-http";
 import { GetAllTypeExcersice } from "../../lib/TypeExcersiceApi";
 import LoadingSpinner from "../../components/UI/LoadingSpinner/LoadingSpinner";
+import TypeExcersiceList from "../../components/TypeExcersice/TypeExcersiceList/TypeExcersiceList";
 
 const AllTypeExcersice = () => {
   const {

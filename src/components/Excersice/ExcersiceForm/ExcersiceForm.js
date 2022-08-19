@@ -1,19 +1,51 @@
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import classes from "./ExcersiceForm.module.css";
+import { GetAllTypeExcersice } from "../../../lib/TypeExcersiceApi";
 
 const ExcersiceForm = (props) => {
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
+  const IdTipoEjercicioInputForm = useRef();
+  const TipoEjercicioInputForm = useRef();
+  let typeExcersiceList;
+
+  const assigmentsValues = async () => {
+    if (!props.esNuevo) {
+      codeInputForm.current.value = props.excersiceObject.Codigo;
+      descriptionInputForm.current.value = props.excersiceObject.Nombre;
+    }
+
+    const result = await GetAllTypeExcersice();
+    typeExcersiceList = result;
+  };
+
+  useEffect(() => {
+    assigmentsValues();
+  }, [assigmentsValues]);
 
   const excersiceSubmitHandler = (event) => {
     event.preventDefault();
 
+    let IdEjercicio = null;
     const code = codeInputForm.current.value;
     const description = descriptionInputForm.current.value;
+    const IdTipoEjercicio = IdTipoEjercicioInputForm.current.value;
+    const TipoEjercicio = TipoEjercicioInputForm.current.value;
+
+    if (!props.esNuevo) {
+      IdEjercicio = props.excersiceObject.IdEjercicio;
+    }
+
+    props.onSaveTypeExcersice({
+      Codigo: code,
+      Nombre: description,
+      IdEjercicio: IdEjercicio,
+      esNuevo: props.excersiceObject.esNuevo,
+    });
   };
 
   return (
-    <section className={classes.typeExcersice}>
+    <section className={classes.Excersice}>
       <h1>
         {props.esNuevo
           ? "Nuevo tipo de ejercicio"

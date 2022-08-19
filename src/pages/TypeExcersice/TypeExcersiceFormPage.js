@@ -11,7 +11,7 @@ const TypeExcersiceFormPage = () => {
 
   useEffect(() => {
     if (status === "completed") {
-      history.push("/");
+      history.push("/type-excersice");
     }
   }, [status, history]);
 

@@ -15,14 +15,14 @@ const TypeExcersiceList = (props) => {
   let typeExcersiceObject;
 
   const newButtonHandler = () => {
-    history.push({ pathname: "/new-excersice", state: { esNuevo: true } });
+    history.push({ pathname: "/new-type-excersice", state: { esNuevo: true } });
   };
 
   const editButtonHandler = (eventValue) => {
     const aux = eventValue.row.data;
     typeExcersiceObject = aux;
     history.push({
-      pathname: "/edit-excersice",
+      pathname: "/edit-type-excersice",
       state: { esNuevo: false, typeExcersiceObject },
     });
   };

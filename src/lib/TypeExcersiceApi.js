@@ -9,18 +9,16 @@ export async function GetAllTypeExcersice() {
     throw new Error("No se encontro datos sobre los tipos de ejercicio");
   }
 
-  console.log(data);
-
   const transformedData = [];
 
-  for (const key in data.posts) {
+  for (const key in data.result) {
     const typeExcersiceObject = {
       IdTipoEjercicio: key,
-      ...data.posts[key],
+      ...data.result[key],
     };
     transformedData.push(typeExcersiceObject);
   }
-  console.log(transformedData);
+
   return transformedData;
 }
 
