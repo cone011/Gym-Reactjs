@@ -9,6 +9,7 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import Card from "../../UI/Card/Card";
 import { useHistory } from "react-router-dom";
+import { GetAllTypeExcersice } from "../../../lib/TypeExcersiceApi";
 
 const ExcersiceList = (props) => {
   const history = useHistory();
@@ -16,14 +17,19 @@ const ExcersiceList = (props) => {
   const editButtonHandler = (eventValue) => {
     const auxObject = eventValue.row.data;
     const excersiceObject = auxObject;
+
     history.push({
       pathname: "/edit-excersice",
       state: { esNuevo: false, excersiceObject },
     });
   };
 
-  const newButtonHandler = () => {
-    history.push({ pathname: "/new-excersice", state: { esNuevo: true } });
+  const newButtonHandler = async () => {
+    const listType = await GetAllTypeExcersice();
+    history.push({
+      pathname: "/new-excersice",
+      state: { esNuevo: true, listType },
+    });
   };
 
   return (

@@ -1,22 +1,18 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
+import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
-import { GetAllTypeExcersice } from "../../../lib/TypeExcersiceApi";
 
 const ExcersiceForm = (props) => {
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
   const IdTipoEjercicioInputForm = useRef();
   const TipoEjercicioInputForm = useRef();
-  let typeExcersiceList;
 
-  const assigmentsValues = async () => {
+  const assigmentsValues = () => {
     if (!props.esNuevo) {
       codeInputForm.current.value = props.excersiceObject.Codigo;
       descriptionInputForm.current.value = props.excersiceObject.Nombre;
     }
-
-    const result = await GetAllTypeExcersice();
-    typeExcersiceList = result;
   };
 
   useEffect(() => {
@@ -63,6 +59,16 @@ const ExcersiceForm = (props) => {
             id="description"
             required
             ref={descriptionInputForm}
+          />
+        </div>
+        <div className={classes.control}>
+          <label htmlFor="type">Tipo Ejercicio</label>
+          <SelectBox
+            dataSource={props.listType}
+            placeholder="Seleccione un tipo de ejercicio"
+            valueExpr="IdTipoEjercicio"
+            displayExpr="Nombre"
+            searchEnabled={true}
           />
         </div>
         <div className={classes.control}>
