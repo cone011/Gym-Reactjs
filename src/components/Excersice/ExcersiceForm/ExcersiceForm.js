@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect } from "react";
 import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
 
@@ -6,18 +6,31 @@ const ExcersiceForm = (props) => {
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
   const IdTipoEjercicioInputForm = useRef();
-  const TipoEjercicioInputForm = useRef();
+  let TipoEjercicio;
 
   const assigmentsValues = () => {
     if (!props.esNuevo) {
       codeInputForm.current.value = props.excersiceObject.Codigo;
       descriptionInputForm.current.value = props.excersiceObject.Nombre;
+      IdTipoEjercicioInputForm.current.value =
+        props.excersiceObject.IdTipoEjercicio;
+      TipoEjercicio = props.excersiceObject.TipoEjercicio;
+
+      console.log(IdTipoEjercicioInputForm.current.value);
     }
   };
 
   useEffect(() => {
     assigmentsValues();
   }, [assigmentsValues]);
+
+  const onSelectedValueChanged = (valueChanged) => {
+    IdTipoEjercicioInputForm.current.value = valueChanged.value;
+    const typeObject = props.listType.find(
+      (item) => item.IdTipoEjercicio === valueChanged.value
+    );
+    TipoEjercicio = typeObject.Nombre;
+  };
 
   const excersiceSubmitHandler = (event) => {
     event.preventDefault();
@@ -26,7 +39,6 @@ const ExcersiceForm = (props) => {
     const code = codeInputForm.current.value;
     const description = descriptionInputForm.current.value;
     const IdTipoEjercicio = IdTipoEjercicioInputForm.current.value;
-    const TipoEjercicio = TipoEjercicioInputForm.current.value;
 
     if (!props.esNuevo) {
       IdEjercicio = props.excersiceObject.IdEjercicio;
@@ -35,6 +47,8 @@ const ExcersiceForm = (props) => {
     props.onSaveTypeExcersice({
       Codigo: code,
       Nombre: description,
+      IdTipoEjercicio: IdTipoEjercicio,
+      TipoEjercicio: TipoEjercicio,
       IdEjercicio: IdEjercicio,
       esNuevo: props.excersiceObject.esNuevo,
     });
@@ -69,12 +83,14 @@ const ExcersiceForm = (props) => {
             valueExpr="IdTipoEjercicio"
             displayExpr="Nombre"
             searchEnabled={true}
+            onValueChanged={onSelectedValueChanged}
+            ref={IdTipoEjercicioInputForm}
           />
         </div>
         <div className={classes.control}>
           <div className={classes.actions}>
             <button type="submit" className={classes.toggle}>
-              guardar
+              Guardar
             </button>
           </div>
         </div>
