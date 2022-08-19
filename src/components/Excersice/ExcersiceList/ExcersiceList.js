@@ -14,13 +14,14 @@ import { GetAllTypeExcersice } from "../../../lib/TypeExcersiceApi";
 const ExcersiceList = (props) => {
   const history = useHistory();
 
-  const editButtonHandler = (eventValue) => {
+  const editButtonHandler = async (eventValue) => {
     const auxObject = eventValue.row.data;
     const excersiceObject = auxObject;
+    const listType = await GetAllTypeExcersice();
 
     history.push({
       pathname: "/edit-excersice",
-      state: { esNuevo: false, excersiceObject },
+      state: { esNuevo: false, excersiceObject, listType },
     });
   };
 

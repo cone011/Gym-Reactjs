@@ -15,8 +15,6 @@ const ExcersiceForm = (props) => {
       IdTipoEjercicioInputForm.current.value =
         props.excersiceObject.IdTipoEjercicio;
       TipoEjercicio = props.excersiceObject.TipoEjercicio;
-
-      console.log(IdTipoEjercicioInputForm.current.value);
     }
   };
 
@@ -43,14 +41,13 @@ const ExcersiceForm = (props) => {
     if (!props.esNuevo) {
       IdEjercicio = props.excersiceObject.IdEjercicio;
     }
-
-    props.onSaveTypeExcersice({
+    props.onSaveExcersice({
       Codigo: code,
       Nombre: description,
       IdTipoEjercicio: IdTipoEjercicio,
       TipoEjercicio: TipoEjercicio,
       IdEjercicio: IdEjercicio,
-      esNuevo: props.excersiceObject.esNuevo,
+      esNuevo: props.esNuevo,
     });
   };
 

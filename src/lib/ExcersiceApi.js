@@ -38,6 +38,7 @@ export async function getSingleExcersice(IdEjercicio) {
 }
 
 export async function saveExcersice(excersiceData) {
+  console.log(excersiceData);
   let method = "POST";
   let callApi = `${CALL_API_ROUTE}/Ejercicio`;
 
@@ -53,6 +54,7 @@ export async function saveExcersice(excersiceData) {
       Codigo: excersiceData.Codigo,
       Nombre: excersiceData.Nombre,
       IdTipoEjercicio: excersiceData.IdTipoEjercicio,
+      TipoEjercicio: excersiceData.TipoEjercicio,
     }),
   });
 
