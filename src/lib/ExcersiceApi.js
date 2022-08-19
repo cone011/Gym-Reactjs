@@ -38,7 +38,6 @@ export async function getSingleExcersice(IdEjercicio) {
 }
 
 export async function saveExcersice(excersiceData) {
-  console.log(excersiceData);
   let method = "POST";
   let callApi = `${CALL_API_ROUTE}/Ejercicio`;
 
