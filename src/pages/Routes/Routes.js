@@ -5,6 +5,7 @@ import Home from "../Home/Home";
 import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
 import TypeExcersiceFormPage from "../TypeExcersice/TypeExcersiceFormPage";
 import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
+import AllAlumno from "../Alumno/AllAlumno";
 const Routes = () => {
   return (
     <Switch>
@@ -34,6 +35,9 @@ const Routes = () => {
       </Route>
       <Route path="/edit-type-excersice" exact>
         <TypeExcersiceFormPage />
+      </Route>
+      <Route path="/alumno" exact>
+        <AllAlumno />
       </Route>
     </Switch>
   );

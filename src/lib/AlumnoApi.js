@@ -36,7 +36,46 @@ export async function getSingleAlumno(IdAlumno) {
   return objectAlumno;
 }
 
-export async function deleteAlumno(IdAlumno) {
+export async function SaveAlumno(alumnoData) {
+  let urlApi = `${CALL_API_ROUTE}/Alumno`;
+
+  let method = "POST";
+
+  if (!alumnoData.esNuevo) {
+    urlApi = `${urlApi}/${alumnoData.IdAlumno}`;
+
+    method = "PUT";
+  }
+
+  const response = await fetch(urlApi, {
+    method: method,
+    "Content-Type": "application/json",
+    body: JSON.stringify({
+      IdUsuario: alumnoData.IdUsuario,
+      Cedula: alumnoData.Cedula,
+      Nombre: alumnoData.Nombre,
+      FechaNacimiento: alumnoData.FechaNacimiento,
+      Edad: alumnoData.Edad,
+      Direccion: alumnoData.Direccion,
+      Telefono: alumnoData.Telefono,
+      Email: alumnoData.Email,
+    }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error("No se pudo realizar la accion");
+  }
+
+  const responseAlumno = {
+    ...data,
+  };
+
+  return responseAlumno;
+}
+
+export async function DeleteAlumno(IdAlumno) {
   const response = await fetch(`${CALL_API_ROUTE}/Alumno/${IdAlumno}`, {
     method: "DELETE",
   });
