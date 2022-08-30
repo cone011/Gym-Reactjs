@@ -50,16 +50,7 @@ export async function SaveAlumno(alumnoData) {
   const response = await fetch(urlApi, {
     method: method,
     "Content-Type": "application/json",
-    body: JSON.stringify({
-      IdUsuario: alumnoData.IdUsuario,
-      Cedula: alumnoData.Cedula,
-      Nombre: alumnoData.Nombre,
-      FechaNacimiento: alumnoData.FechaNacimiento,
-      Edad: alumnoData.Edad,
-      Direccion: alumnoData.Direccion,
-      Telefono: alumnoData.Telefono,
-      Email: alumnoData.Email,
-    }),
+    body: JSON.stringify({ ...alumnoData }),
   });
 
   const data = await response.json();

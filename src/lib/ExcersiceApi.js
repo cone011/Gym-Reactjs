@@ -50,10 +50,7 @@ export async function saveExcersice(excersiceData) {
     method: method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      Codigo: excersiceData.Codigo,
-      Nombre: excersiceData.Nombre,
-      IdTipoEjercicio: excersiceData.IdTipoEjercicio,
-      TipoEjercicio: excersiceData.TipoEjercicio,
+      ...excersiceData,
     }),
   });
 

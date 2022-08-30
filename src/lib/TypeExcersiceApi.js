@@ -52,10 +52,7 @@ export async function SaveTypeExcersice(typeExcersiceData) {
   const response = await fetch(`${callApi}`, {
     method: method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      Codigo: typeExcersiceData.Codigo,
-      Nombre: typeExcersiceData.Descripcion,
-    }),
+    body: JSON.stringify({ ...typeExcersiceData }),
   });
 
   const data = await response.json();
