@@ -86,5 +86,9 @@ export async function DeleteAlumno(IdAlumno) {
     throw new Error(data.message || "Could not delete the alumno");
   }
 
-  return data;
+  const responseData = {
+    ...data,
+  };
+
+  return responseData;
 }

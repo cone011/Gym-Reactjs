@@ -1,16 +1,17 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import classes from "./TypeExcersiceForm.module.css";
 
 const TypeExcersiceForm = (props) => {
+  const { esNuevo, typeExcersiceObject } = props;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
 
-  const assigmentsValues = () => {
-    if (!props.esNuevo) {
-      codeInputForm.current.value = props.typeExcersiceObject.Codigo;
-      descriptionInputForm.current.value = props.typeExcersiceObject.Nombre;
+  const assigmentsValues = useCallback(() => {
+    if (!esNuevo) {
+      codeInputForm.current.value = typeExcersiceObject.Codigo;
+      descriptionInputForm.current.value = typeExcersiceObject.Nombre;
     }
-  };
+  }, [esNuevo, typeExcersiceObject]);
 
   useEffect(() => {
     assigmentsValues();
@@ -19,8 +20,8 @@ const TypeExcersiceForm = (props) => {
   const typeExcersiceSubmitHandler = (event) => {
     event.preventDefault();
     let IdTipoEjercicio = null;
-    if (!props.esNuevo) {
-      IdTipoEjercicio = props.typeExcersiceObject.IdTipoEjercicio;
+    if (!esNuevo) {
+      IdTipoEjercicio = typeExcersiceObject.IdTipoEjercicio;
     }
     const code = codeInputForm.current.value;
     const description = descriptionInputForm.current.value;
@@ -28,16 +29,14 @@ const TypeExcersiceForm = (props) => {
       Codigo: code,
       Descripcion: description,
       IdTipoEjercicio: IdTipoEjercicio,
-      esNuevo: props.esNuevo,
+      esNuevo: esNuevo,
     });
   };
 
   return (
     <section className={classes.typeExcersice}>
       <h1>
-        {props.esNuevo
-          ? "Nuevo tipo de ejercicio"
-          : "Modificar tipo de ejercicio"}
+        {esNuevo ? "Nuevo tipo de ejercicio" : "Modificar tipo de ejercicio"}
       </h1>
       <form onSubmit={typeExcersiceSubmitHandler}>
         <div className={classes.control}>

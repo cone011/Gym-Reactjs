@@ -1,7 +1,8 @@
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
+import classes from "./TrainnerForm.module.css";
 
-const AlumnoForm = (props) => {
-  const { alumnoObject, esNuevo, IdUsuario } = props;
+const TrainnerForm = (props) => {
+  const { trainnerObject, esNuevo, IdUsuario } = props;
   const nameInputRef = useRef();
   const cedulaInputRef = useRef();
   const fechaNacInputRef = useRef();
@@ -23,7 +24,7 @@ const AlumnoForm = (props) => {
       telefonoInputRef.current.value = alumnoObject.telefono;
       emailInputRef.current.value = alumnoObject.email;
     }
-  }, [esNuevo, alumnoObject]);
+  }, [esNuevo, trainnerObject]);
 
   useEffect(() => {
     assigmentValues();
@@ -39,9 +40,8 @@ const AlumnoForm = (props) => {
     modalHandler();
   };
 
-  const alumnoSubmitHandler = (event) => {
+  const trainnerSubmitHandler = (event) => {
     event.preventDefault();
-
     if (nameInputRef.current.value.trim().length === 0) {
       showMessageError("Favor cargue su nombre");
       return;
@@ -78,10 +78,10 @@ const AlumnoForm = (props) => {
       IdUsuario: IdUsuario,
     };
 
-    props.onAddAlumno({
+    props.onAddTrainner({
       ...sendDataObject,
     });
   };
 };
 
-export default AlumnoForm;
+export default TrainnerForm;

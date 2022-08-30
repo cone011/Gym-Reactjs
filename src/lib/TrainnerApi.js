@@ -52,7 +52,8 @@ export async function SaveTrainner(trainnerData) {
 
   const response = await fetch(urlApi, {
     method: method,
-    "Content-Type": "application/json",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...trainnerData }),
   });
 
   const data = await response.json();
