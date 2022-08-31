@@ -1,22 +1,37 @@
-import {
-  useEffect,
-  useCallback,
-  useState,
-  Fragment,
-  useState,
-  useRef,
-} from "react";
-import classes from "./DietaForm.module.css";
+import { useEffect, useCallback, Fragment, useState, useRef } from "react";
+import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
+import classes from "./DietForm.module.css";
 
 const DietaForm = (props) => {
   const { dietData, esNuevo } = props;
+  const [isShowingSearch, SetShowSearch] = useState(false);
   const [isShowing, SetIsShowing] = useState(false);
   const [isError, SetIsError] = useState(false);
   const [message, SetMessage] = useState("");
   const fechaInputRef = useRef();
+  const alumnoInputRef = useRef();
+
+  const assigmentValue = useCallback(() => {
+    if (esNuevo) {
+      fechaInputRef.current.value = dietData.fecha;
+      alumnoInputRef.current.value = dietData.alumno;
+    }
+  }, [esNuevo, dietData]);
+
+  useEffect(() => {
+    assigmentValue();
+  }, [assigmentValue]);
+
+  const moduleHandler = () => {
+    SetShowSearch(!isShowingSearch);
+  };
 
   const dietFormHandler = (event) => {
     event.preventHanlder();
+  };
+
+  const onShowSearchAlumno = () => {
+    moduleHandler();
   };
 
   return (
@@ -30,7 +45,24 @@ const DietaForm = (props) => {
           </div>
 
           <div className={classes.control}>
-            <label htmlFor="alumno">Alumno/Paciente</label>
+            <label htmlFor="alumno">Alumno</label>
+            <input
+              type="text"
+              id="alumno"
+              readOnly
+              disabled
+              ref={alumnoInputRef}
+            />
+
+            <div className={classes.actions}>
+              <button
+                type="button"
+                className={classes.toggle}
+                onClick={onShowSearchAlumno}
+              >
+                Buscar
+              </button>
+            </div>
           </div>
 
           <div className={classes.control}>
@@ -42,6 +74,12 @@ const DietaForm = (props) => {
           </div>
         </form>
       </section>
+      {isShowingSearch && (
+        <SearchAlumno
+          showModal={isShowingSearch}
+          modalHandler={moduleHandler}
+        />
+      )}
     </Fragment>
   );
 };

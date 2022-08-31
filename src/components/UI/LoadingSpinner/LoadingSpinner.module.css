@@ -18,8 +18,8 @@
   height: 64px;
   margin: 8px;
   border-radius: 50%;
-  border: 6px solid rgb(0, 0, 0);
-  border-color: rgb(0, 0, 0) transparent rgb(0, 0, 0) transparent;
+  border: 6px solid rgb(156, 156, 156);
+  border-color: rgb(156, 156, 156) transparent rgb(156, 156, 156) transparent;
   animation: spinner 1.2s linear infinite;
 }
 

@@ -36,6 +36,28 @@ export async function getSingleAlumno(IdAlumno) {
   return objectAlumno;
 }
 
+export async function GetSearchAlumno(sqlSearch) {
+  const response = await fetch(`${CALL_API_ROUTE}/Alumno-search/${sqlSearch}`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Could find any data with this value");
+  }
+
+  const transformedData = [];
+
+  for (const key in data.result) {
+    const alumnoObject = {
+      IdAlumno: key,
+      ...data.result[key],
+    };
+    transformedData.push(alumnoObject);
+  }
+
+  return transformedData;
+}
+
 export async function SaveAlumno(alumnoData) {
   let urlApi = `${CALL_API_ROUTE}/Alumno`;
 

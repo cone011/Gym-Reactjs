@@ -28,7 +28,7 @@ const AllAlumno = () => {
     return <p className="centered focused">{error}</p>;
   }
 
-  return <AlumnoList alumnoData={loadedAlumno} />;
+  return <AlumnoList alumnoData={loadedAlumno} isSearching={false} />;
 };
 
 export default AllAlumno;

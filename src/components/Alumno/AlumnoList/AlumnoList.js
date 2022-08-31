@@ -2,7 +2,7 @@ import React from "react";
 import classes from "./AlumnoList.module.css";
 import DataGrid, {
   Column,
-  SearchPanel,
+  Selection,
   HeaderFilter,
   FilterRow,
   Button,
@@ -19,9 +19,29 @@ const AlumnoList = (props) => {
           rowAlternationEnabled={true}
           showBorders={true}
         >
+          <Selection mode="single" />
           <FilterRow visible={true} applyFilter={true} />
           <HeaderFilter visible={true} />
-          <SearchPanel visible={true} highlightCaseSensitive={true} />
+          <Column
+            dataField="IdAlumno"
+            caption="#"
+            dataType="number"
+            visible={false}
+          />
+          <Column
+            dataField="IdUsuario"
+            caption="Id User."
+            dataType="number"
+            visible={false}
+          />
+          <Column dataField="Cedula" caption="CI." dataType="string" />
+          <Column dataField="Nombre" caption="Nombre" dataType="string" />
+          {!props.isSearching && (
+            <Column dataField="Telefono" caption="Telefono" dataType="string" />
+          )}
+          {!props.isSearching && (
+            <Column dataField="Email" caption="Email" dataType="string" />
+          )}
         </DataGrid>
       </Card>
     </div>

@@ -1,22 +1,22 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useCallback } from "react";
 import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
 
 const ExcersiceForm = (props) => {
+  const { excersiceObject, esNuevo } = props;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
   const IdTipoEjercicioInputForm = useRef();
   let TipoEjercicio;
 
-  const assigmentsValues = () => {
-    if (!props.esNuevo) {
-      codeInputForm.current.value = props.excersiceObject.Codigo;
-      descriptionInputForm.current.value = props.excersiceObject.Nombre;
-      IdTipoEjercicioInputForm.current.value =
-        props.excersiceObject.IdTipoEjercicio;
-      TipoEjercicio = props.excersiceObject.TipoEjercicio;
+  const assigmentsValues = useCallback(() => {
+    if (!esNuevo) {
+      codeInputForm.current.value = excersiceObject.Codigo;
+      descriptionInputForm.current.value = excersiceObject.Nombre;
+      IdTipoEjercicioInputForm.current.value = excersiceObject.IdTipoEjercicio;
+      TipoEjercicio = excersiceObject.TipoEjercicio;
     }
-  };
+  }, [esNuevo, excersiceObject, TipoEjercicio]);
 
   useEffect(() => {
     assigmentsValues();
@@ -38,8 +38,8 @@ const ExcersiceForm = (props) => {
     const description = descriptionInputForm.current.value;
     const IdTipoEjercicio = IdTipoEjercicioInputForm.current.value;
 
-    if (!props.esNuevo) {
-      IdEjercicio = props.excersiceObject.IdEjercicio;
+    if (!esNuevo) {
+      IdEjercicio = excersiceObject.IdEjercicio;
     }
     props.onSaveExcersice({
       Codigo: code,
