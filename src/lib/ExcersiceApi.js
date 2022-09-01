@@ -41,17 +41,14 @@ export async function saveExcersice(excersiceData) {
   let method = "POST";
   let callApi = `${CALL_API_ROUTE}/Ejercicio`;
 
-  if (!excersiceData.esNuevo) {
+  if (!excersiceData.get("esNuevo")) {
     method = "PUT";
-    callApi = `${callApi}/${excersiceData.IdEjercicio}`;
+    callApi = `${callApi}/${excersiceData.get("IdEjercicio")}`;
   }
 
   const response = await fetch(`${callApi}`, {
     method: method,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      ...excersiceData,
-    }),
+    body: excersiceData,
   });
 
   const data = await response.json();

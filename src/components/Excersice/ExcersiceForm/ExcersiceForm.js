@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback, useReducer } from "react";
+import { useRef, useEffect, useCallback, useReducer, useState } from "react";
 import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
@@ -6,13 +6,20 @@ import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 const imageReducer = (curImageState, action) => {
   switch (action.type) {
     case "BEGIN":
-      return { loading: true, error: false, isShow: false, imgExcersice: null };
+      return {
+        loading: true,
+        error: false,
+        isShow: false,
+        imgExcersice: null,
+        imgSend: null,
+      };
     case "ERROR":
       return {
         ...curImageState,
         loading: false,
         error: true,
         imgExcersice: null,
+        imgSend: null,
       };
     case "END":
       return {
@@ -20,6 +27,7 @@ const imageReducer = (curImageState, action) => {
         loading: false,
         isShow: true,
         imgExcersice: action.imgExcersice,
+        imgSend: action.imgSend,
       };
     default:
       throw new Error("No se pudo realizar la accion");
@@ -36,8 +44,9 @@ const ExcersiceForm = (props) => {
     error: false,
     isShow: false,
     imgExcersice: null,
+    imgSend: null,
   });
-  let TipoEjercicio;
+  const [TipoEjercicio, SetTipoEjercicio] = useState("");
 
   const assigmentsValues = useCallback(() => {
     if (!esNuevo) {
@@ -56,7 +65,7 @@ const ExcersiceForm = (props) => {
     const typeObject = props.listType.find(
       (item) => item.IdTipoEjercicio === valueChanged.value
     );
-    TipoEjercicio = typeObject.Nombre;
+    SetTipoEjercicio(typeObject.Nombre);
   };
 
   const onSelectedFileChanged = (value) => {
@@ -66,11 +75,10 @@ const ExcersiceForm = (props) => {
       let reader = new FileReader();
       reader.readAsArrayBuffer(selectedFile);
       reader.onload = (e) => {
-        console.log(e.target.result);
-        //SetImgExcersice(URL.createObjectURL(selectedFile));
         dispatchImage({
           type: "END",
           imgExcersice: URL.createObjectURL(selectedFile),
+          imgSend: selectedFile,
         });
       };
     }
@@ -87,14 +95,17 @@ const ExcersiceForm = (props) => {
     if (!esNuevo) {
       IdEjercicio = excersiceObject.IdEjercicio;
     }
-    props.onSaveExcersice({
-      Codigo: code,
-      Nombre: description,
-      IdTipoEjercicio: IdTipoEjercicio,
-      TipoEjercicio: TipoEjercicio,
-      IdEjercicio: IdEjercicio,
-      esNuevo: props.esNuevo,
-    });
+
+    const formData = new FormData();
+    formData.append("Codigo", code);
+    formData.append("Nombre", description);
+    formData.append("IdTipoEjercicio", IdTipoEjercicio);
+    formData.append("TipoEjercicio", TipoEjercicio);
+    formData.append("IdEjercicio", IdEjercicio);
+    formData.append("esNuevo", esNuevo);
+    formData.append("image", httpImage.imgSend);
+
+    props.onSaveExcersice(formData);
   };
 
   return (
