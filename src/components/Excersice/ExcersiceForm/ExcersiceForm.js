@@ -1,12 +1,42 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useRef, useEffect, useCallback, useReducer } from "react";
 import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
+import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
+
+const imageReducer = (curImageState, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { loading: true, error: false, isShow: false, imgExcersice: null };
+    case "ERROR":
+      return {
+        ...curImageState,
+        loading: false,
+        error: true,
+        imgExcersice: null,
+      };
+    case "END":
+      return {
+        ...curImageState,
+        loading: false,
+        isShow: true,
+        imgExcersice: action.imgExcersice,
+      };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const ExcersiceForm = (props) => {
   const { excersiceObject, esNuevo } = props;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
   const IdTipoEjercicioInputForm = useRef();
+  const [httpImage, dispatchImage] = useReducer(imageReducer, {
+    loading: false,
+    error: false,
+    isShow: false,
+    imgExcersice: null,
+  });
   let TipoEjercicio;
 
   const assigmentsValues = useCallback(() => {
@@ -14,9 +44,8 @@ const ExcersiceForm = (props) => {
       codeInputForm.current.value = excersiceObject.Codigo;
       descriptionInputForm.current.value = excersiceObject.Nombre;
       IdTipoEjercicioInputForm.current.value = excersiceObject.IdTipoEjercicio;
-      TipoEjercicio = excersiceObject.TipoEjercicio;
     }
-  }, [esNuevo, excersiceObject, TipoEjercicio]);
+  }, [esNuevo, excersiceObject]);
 
   useEffect(() => {
     assigmentsValues();
@@ -28,6 +57,23 @@ const ExcersiceForm = (props) => {
       (item) => item.IdTipoEjercicio === valueChanged.value
     );
     TipoEjercicio = typeObject.Nombre;
+  };
+
+  const onSelectedFileChanged = (value) => {
+    dispatchImage({ type: "BEGIN" });
+    let selectedFile = value.target.files[0];
+    if (selectedFile) {
+      let reader = new FileReader();
+      reader.readAsArrayBuffer(selectedFile);
+      reader.onload = (e) => {
+        console.log(e.target.result);
+        //SetImgExcersice(URL.createObjectURL(selectedFile));
+        dispatchImage({
+          type: "END",
+          imgExcersice: URL.createObjectURL(selectedFile),
+        });
+      };
+    }
   };
 
   const excersiceSubmitHandler = (event) => {
@@ -53,11 +99,7 @@ const ExcersiceForm = (props) => {
 
   return (
     <section className={classes.Excersice}>
-      <h1>
-        {props.esNuevo
-          ? "Nuevo tipo de ejercicio"
-          : "Modificar tipo de ejercicio"}
-      </h1>
+      <h1>{props.esNuevo ? "Nuevo ejercicio" : "Modificar ejercicio"}</h1>
       <form onSubmit={excersiceSubmitHandler}>
         <div className={classes.control}>
           <label htmlFor="code">Codigo</label>
@@ -80,9 +122,28 @@ const ExcersiceForm = (props) => {
             valueExpr="IdTipoEjercicio"
             displayExpr="Nombre"
             searchEnabled={true}
+            defaultValue={esNuevo ? null : excersiceObject.TipoEjercicio}
             onValueChanged={onSelectedValueChanged}
             ref={IdTipoEjercicioInputForm}
           />
+        </div>
+        <div className={classes.control}>
+          <label htmlFor="imagen">Imagen</label>
+          <input
+            type="file"
+            className="form-control"
+            id="image"
+            required
+            onChange={onSelectedFileChanged}
+          />
+        </div>
+        <div className={classes.control}>
+          {httpImage.loading && <LoadingSpinner />}
+          {!httpImage.loading && !httpImage.error && httpImage.isShow && (
+            <div className={classes.holder}>
+              <img src={httpImage.imgExcersice} alt="img" />
+            </div>
+          )}
         </div>
         <div className={classes.control}>
           <div className={classes.actions}>
