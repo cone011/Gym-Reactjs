@@ -80,6 +80,9 @@ const DietaDetailList = (props) => {
             <Selection mode="single" />
             <FilterRow visible={true} applyFilter={true} />
             <HeaderFilter visible={true} />
+            <Column dataField="IdDia" caption="#" dataType="number" />
+            <Column dataField="IdFormaComida" caption="#" dataType="number" />
+            <Column dataField="Concepto" caption="Concepto" dataType="string" />
           </DataGrid>
         </Card>
       </div>

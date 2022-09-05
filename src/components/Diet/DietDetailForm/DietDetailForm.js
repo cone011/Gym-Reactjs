@@ -26,24 +26,24 @@ const DietDetailForm = (props) => {
 
   const onSelectedDiaValueChanged = (valueChanged) => {
     diaInputRef.current.value = valueChanged.value;
-    let result = listDia.filter((item) => item.IdDia === valueChanged.value);
+    /*let result = listDia.filter((item) => item.IdDia === valueChanged.value);
     dietDetailObject = {
       ...dietDetailObject,
       IdDia: result[0].IdDia,
       Dia: result[0].Dia,
-    };
+    };*/
   };
 
   const onSelectedFormaComidaValueChanged = (valueChanged) => {
     formaComidaInputRef.current.value = valueChanged.value;
-    let result = listFormaComida.filter(
+    /*let result = listFormaComida.filter(
       (item) => item.IdFormaComida === valueChanged.value
     );
     dietDetailObject = {
       ...dietDetailObject,
       IdFormaComida: result[0].IdFormaComida,
       FormaComida: result[0].FormaComida,
-    };
+    };*/
   };
 
   const saveDetail = () => {
