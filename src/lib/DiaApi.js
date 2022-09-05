@@ -11,10 +11,10 @@ export async function getAllDays() {
 
   const transformedData = [];
 
-  for (const key in data) {
+  for (const key in data.result) {
     const objectDia = {
       IdDia: key,
-      ...data,
+      ...data.result[key],
     };
     transformedData.push(objectDia);
   }

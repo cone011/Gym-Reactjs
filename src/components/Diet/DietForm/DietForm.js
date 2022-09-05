@@ -1,37 +1,111 @@
-import { useEffect, useCallback, Fragment, useState, useRef } from "react";
+import {
+  useEffect,
+  useCallback,
+  Fragment,
+  useRef,
+  useReducer,
+  useState,
+} from "react";
 import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
 import classes from "./DietForm.module.css";
+import { GetAllTrainner } from "../../../lib/TrainnerApi";
+import { SelectBox } from "devextreme-react/select-box";
+import DietaDetailList from "../DietDetailList/DietDetailList";
+
+const dietaReducer = (curDieta, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return {
+        isLoading: true,
+        isShowing: false,
+        isError: false,
+        message: null,
+      };
+    case "ERROR":
+      return {
+        isLoading: false,
+        isShowing: true,
+        isError: true,
+        message: action.message,
+      };
+    case "END":
+      return { ...curDieta, isLoading: false };
+    case "CLOSED":
+      return { ...curDieta, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const searchReducer = (curSearch, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return {
+        isShowingSearch: true,
+        error: false,
+        message: null,
+        alumnoDataSelected: null,
+      };
+    case "ERROR":
+      return {
+        ...curSearch,
+        error: true,
+        message: "No se pudo obtener los datos del alumno",
+      };
+    case "END":
+      return {
+        ...curSearch,
+        isShowingSearch: false,
+        alumnoDataSelected: action.isShowingSearch,
+      };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const DietaForm = (props) => {
   const { dietData, esNuevo } = props;
-  const [isShowingSearch, SetShowSearch] = useState(false);
-  const [isShowing, SetIsShowing] = useState(false);
-  const [isError, SetIsError] = useState(false);
-  const [message, SetMessage] = useState("");
+  const [httpSearch, dispatchSearch] = useReducer(searchReducer, {
+    isShowingSearch: false,
+    error: false,
+    message: null,
+    alumnoDataSelected: null,
+  });
+  const [httpDieta, dispatchDieta] = useReducer(dietaReducer, {
+    isLoading: false,
+    isShowing: false,
+    isError: false,
+    message: null,
+  });
+  const [listTrainner, SetTrainnerList] = useState([]);
   const fechaInputRef = useRef();
   const alumnoInputRef = useRef();
+  const trainnerInputRef = useRef();
 
-  const assigmentValue = useCallback(() => {
-    if (esNuevo) {
+  const assigmentValue = useCallback(async () => {
+    if (!esNuevo) {
       fechaInputRef.current.value = dietData.fecha;
       alumnoInputRef.current.value = dietData.alumno;
     }
+    let response = await GetAllTrainner();
+    SetTrainnerList(response);
   }, [esNuevo, dietData]);
 
   useEffect(() => {
     assigmentValue();
   }, [assigmentValue]);
 
-  const moduleHandler = () => {
-    SetShowSearch(!isShowingSearch);
-  };
-
   const dietFormHandler = (event) => {
     event.preventHanlder();
   };
 
   const onShowSearchAlumno = () => {
-    moduleHandler();
+    dispatchSearch({ type: "BEGIN" });
+  };
+
+  const onAlumnoSelected = (alumnoDataSelected) => {
+    alumnoInputRef.current.value = alumnoDataSelected.Nombre;
+    dispatchSearch({ type: "END", alumnoDataSelected: alumnoDataSelected });
   };
 
   return (
@@ -66,6 +140,18 @@ const DietaForm = (props) => {
           </div>
 
           <div className={classes.control}>
+            <label htmlFor="trainner">Trainner</label>
+            <SelectBox
+              dataSource={listTrainner}
+              placeholder="Seleccione un trainner"
+              valueExpr="IdTrainner"
+              displayExpr="Nombre"
+              searchEnabled={true}
+              ref={trainnerInputRef}
+            />
+          </div>
+          <DietaDetailList dietaDetalleList={dietData.dietaDetalleList} />
+          <div className={classes.control}>
             <div className={classes.actions}>
               <button type="submit" className={classes.toggle}>
                 Guardar
@@ -74,10 +160,10 @@ const DietaForm = (props) => {
           </div>
         </form>
       </section>
-      {isShowingSearch && (
+      {httpSearch.isShowingSearch && (
         <SearchAlumno
-          showModal={isShowingSearch}
-          modalHandler={moduleHandler}
+          showModal={httpSearch.isShowingSearch}
+          onAlumnoSelectedValue={onAlumnoSelected}
         />
       )}
     </Fragment>

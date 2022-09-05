@@ -10,6 +10,10 @@ import DataGrid, {
 import Card from "../../UI/Card/Card";
 
 const AlumnoList = (props) => {
+  const selectedValueHandler = (eventValue) => {
+    props.onValueSelected({ ...eventValue.row.data });
+  };
+
   return (
     <div>
       <Card className={classes.tableCenteredAlumno}>
@@ -41,6 +45,17 @@ const AlumnoList = (props) => {
           )}
           {!props.isSearching && (
             <Column dataField="Email" caption="Email" dataType="string" />
+          )}
+          {props.isSearching && (
+            <Column type="buttons">
+              <Button
+                name="editar"
+                cssClass="btn"
+                onClick={selectedValueHandler}
+              >
+                Seleccionar
+              </Button>
+            </Column>
           )}
         </DataGrid>
       </Card>

@@ -53,8 +53,10 @@ const ExcersiceForm = (props) => {
       codeInputForm.current.value = excersiceObject.Codigo;
       descriptionInputForm.current.value = excersiceObject.Nombre;
       IdTipoEjercicioInputForm.current.value = excersiceObject.IdTipoEjercicio;
+      httpImage.imgExcersice = excersiceObject.ImagenUrl;
+      console.log(httpImage.imgExcersice);
     }
-  }, [esNuevo, excersiceObject]);
+  }, [esNuevo, excersiceObject, httpImage]);
 
   useEffect(() => {
     assigmentsValues();

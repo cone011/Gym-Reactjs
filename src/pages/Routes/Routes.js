@@ -41,7 +41,7 @@ const Routes = () => {
         <AllAlumno />
       </Route>
       <Route path="/new-diet" exact>
-        <DietaForm />
+        <DietaForm esNuevo={true} dietData={{ dietaDetalleList: [] }} />
       </Route>
     </Switch>
   );

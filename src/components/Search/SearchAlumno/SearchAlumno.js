@@ -45,6 +45,10 @@ const SearchAlumno = (props) => {
     dispatchHttp({ type: "RESPONSE" });
   };
 
+  const valueSelected = (alumnoData) => {
+    props.onAlumnoSelectedValue({ ...alumnoData });
+  };
+
   return (
     <Modal
       show={props.showModal}
@@ -80,7 +84,11 @@ const SearchAlumno = (props) => {
           </form>
           {httpState.loading && <LoadingSpinner />}
           {!httpState.loading && !httpState.error && httpState.isShowing && (
-            <AlumnoList alumnoData={listSearch} isSearching={true} />
+            <AlumnoList
+              alumnoData={listSearch}
+              isSearching={true}
+              onValueSelected={valueSelected}
+            />
           )}
         </section>
       </Modal.Body>
