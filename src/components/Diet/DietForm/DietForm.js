@@ -54,6 +54,8 @@ const searchReducer = (curSearch, action) => {
         error: true,
         message: "No se pudo obtener los datos del alumno",
       };
+    case "CLOSED":
+      return { ...curSearch, isShowingSearch: false };
     case "END":
       return {
         ...curSearch,
@@ -96,6 +98,10 @@ const DietaForm = (props) => {
   useEffect(() => {
     assigmentValue();
   }, [assigmentValue]);
+
+  const modalShowHandler = () => {
+    dispatchSearch({ type: "CLOSED" });
+  };
 
   const dietFormHandler = (event) => {
     event.preventDefault();
@@ -140,7 +146,7 @@ const DietaForm = (props) => {
       FechaCarga: fechaInputRef.current.value,
       IdTrainner: trainnerSeleceted.IdTrainner,
       Trainner: trainnerSeleceted.Nombre,
-      dietaDetalleList: dietData.dietaDetalleList,
+      DietaDetalleList: dietData.dietaDetalleList,
       esNuevo: esNuevo,
     };
 
@@ -180,7 +186,7 @@ const DietaForm = (props) => {
               ref={alumnoInputRef}
             />
 
-            <div className={classes.actions}>
+            <div className={classes.actionsSearch}>
               <button
                 type="button"
                 className={classes.toggle}
@@ -217,6 +223,7 @@ const DietaForm = (props) => {
       {httpSearch.isShowingSearch && (
         <SearchAlumno
           showModal={httpSearch.isShowingSearch}
+          modalHandler={modalShowHandler}
           onAlumnoSelectedValue={onAlumnoSelected}
         />
       )}

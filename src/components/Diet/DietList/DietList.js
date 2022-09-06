@@ -34,9 +34,9 @@ const DietList = (props) => {
 
   return (
     <div>
-      <Card>
+      <Card className={classes.tableCenteredDiet}>
         <div className={classes.newDiet} onClick={newButtonHandler}>
-          <button>Nuevo Subscriptor</button>
+          <button>Nueva Dieta</button>
         </div>
       </Card>
     </div>
