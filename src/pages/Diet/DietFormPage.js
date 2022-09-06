@@ -11,7 +11,7 @@ const DietFormPage = () => {
 
   useEffect(() => {
     if (status === "completed") {
-      history.push("/");
+      history.push("/diet");
     }
   }, [status, history]);
 

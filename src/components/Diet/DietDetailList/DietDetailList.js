@@ -18,6 +18,7 @@ const dietDetailReducer = (curDietDetail, action) => {
         error: false,
         message: null,
         esNuevo: action.esNuevo,
+        rowIndex: action.rowIndex,
         dietaDetailSelected: action.dietaDetailSelected,
       };
     case "ERROR":
@@ -30,6 +31,8 @@ const dietDetailReducer = (curDietDetail, action) => {
         isShowDetail: false,
         dietaDetailSelected: action.dietaDetailSelected,
       };
+    default:
+      throw new Error("No se pudo realizar la accion");
   }
 };
 
@@ -46,7 +49,17 @@ const DietaDetailList = (props) => {
     dispatchDietaDetail({
       type: "BEGIN",
       dietaDetailSelected: null,
+      rowIndex: null,
       esNuevo: true,
+    });
+  };
+
+  const onModifyDietDetail = (eventValue) => {
+    dispatchDietaDetail({
+      type: "BEGIN",
+      dietaDetailSelected: eventValue.row.data,
+      rowIndex: eventValue.row.rowIndex,
+      esNuevo: false,
     });
   };
 
@@ -56,8 +69,20 @@ const DietaDetailList = (props) => {
 
   const onSaveDietDetail = (dietDetailData) => {
     dispatchDietaDetail({ type: "CLOSED" });
-    console.log(dietDetailData);
-    props.dietaDetalleList.push(dietDetailData);
+
+    if (dietDetailData.esNuevo) {
+      props.dietaDetalleList.push(dietDetailData);
+    } else {
+      props.dietaDetalleList[dietDetailData.rowIndex] = {
+        IdDia: dietDetailData.IdDia,
+        Dia: dietDetailData.Dia,
+        IdFormaComida: dietDetailData.IdFormaComida,
+        FormaComida: dietDetailData.FormaComida,
+        Concepto: dietDetailData.Concepto,
+        esNuevo: dietDetailData.esNuevo,
+      };
+    }
+
     dataGridRef.current.instance.refresh();
   };
 
@@ -80,9 +105,18 @@ const DietaDetailList = (props) => {
             <Selection mode="single" />
             <FilterRow visible={true} applyFilter={true} />
             <HeaderFilter visible={true} />
-            <Column dataField="IdDia" caption="#" dataType="number" />
-            <Column dataField="IdFormaComida" caption="#" dataType="number" />
+            <Column dataField="Dia" caption="Dia" dataType="string" />
+            <Column
+              dataField="FormaComida"
+              caption="Forma Comida"
+              dataType="string"
+            />
             <Column dataField="Concepto" caption="Concepto" dataType="string" />
+            <Column type="buttons">
+              <Button name="editar" cssClass="btn" onClick={onModifyDietDetail}>
+                Editar
+              </Button>
+            </Column>
           </DataGrid>
         </Card>
       </div>
@@ -93,6 +127,7 @@ const DietaDetailList = (props) => {
           dietDetailObject={httpDietaDetail.dietaDetailSelected}
           esNuevo={httpDietaDetail.esNuevo}
           saveDietDetail={onSaveDietDetail}
+          rowIndex={httpDietaDetail.rowIndex}
         />
       )}
     </Fragment>

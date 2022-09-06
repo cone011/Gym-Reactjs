@@ -11,6 +11,8 @@ import classes from "./DietForm.module.css";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
 import { SelectBox } from "devextreme-react/select-box";
 import DietaDetailList from "../DietDetailList/DietDetailList";
+import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
+import { SearchList } from "../../../util/FindItem";
 
 const dietaReducer = (curDieta, action) => {
   switch (action.type) {
@@ -56,7 +58,7 @@ const searchReducer = (curSearch, action) => {
       return {
         ...curSearch,
         isShowingSearch: false,
-        alumnoDataSelected: action.isShowingSearch,
+        alumnoDataSelected: action.alumnoDataSelected,
       };
     default:
       throw new Error("No se pudo realizar la accion");
@@ -96,7 +98,53 @@ const DietaForm = (props) => {
   }, [assigmentValue]);
 
   const dietFormHandler = (event) => {
-    event.preventHanlder();
+    event.preventDefault();
+
+    dispatchDieta({ type: "BEGIN" });
+
+    if (alumnoInputRef.current.value === 0) {
+      dispatchDieta({
+        type: "ERROR",
+        message: "No hay un alumno asignado a este registro",
+      });
+      return;
+    }
+
+    if (trainnerInputRef.current.value === 0) {
+      dispatchDieta({
+        type: "ERROR",
+        message: "No se asigno un entrenador",
+      });
+      return;
+    }
+
+    if (dietData.length === 0 || dietData === null) {
+      dispatchDieta({
+        type: "ERROR",
+        message: "No hay detalles en este registro",
+      });
+      return;
+    }
+
+    dispatchDieta({ type: "END" });
+
+    const trainnerSeleceted = SearchList(
+      listTrainner,
+      "IdTrainner",
+      trainnerInputRef.current.value
+    );
+
+    let sendDietData = {
+      IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
+      Alumno: httpSearch.alumnoDataSelected.Nombre,
+      FechaCarga: fechaInputRef.current.value,
+      IdTrainner: trainnerSeleceted.IdTrainner,
+      Trainner: trainnerSeleceted.Nombre,
+      dietaDetalleList: dietData.dietaDetalleList,
+      esNuevo: esNuevo,
+    };
+
+    props.OnsaveDiet({ ...sendDietData });
   };
 
   const onShowSearchAlumno = () => {
@@ -106,6 +154,10 @@ const DietaForm = (props) => {
   const onAlumnoSelected = (alumnoDataSelected) => {
     alumnoInputRef.current.value = alumnoDataSelected.Nombre;
     dispatchSearch({ type: "END", alumnoDataSelected: alumnoDataSelected });
+  };
+
+  const onSelectedTrainnerChanged = (valueChanged) => {
+    trainnerInputRef.current.value = valueChanged.value;
   };
 
   return (
@@ -148,6 +200,7 @@ const DietaForm = (props) => {
               displayExpr="Nombre"
               searchEnabled={true}
               ref={trainnerInputRef}
+              onValueChanged={onSelectedTrainnerChanged}
             />
           </div>
           <DietaDetailList dietaDetalleList={dietData.dietaDetalleList} />
@@ -160,6 +213,7 @@ const DietaForm = (props) => {
           </div>
         </form>
       </section>
+      {httpDieta.isShowing && <LoadingSpinner />}
       {httpSearch.isShowingSearch && (
         <SearchAlumno
           showModal={httpSearch.isShowingSearch}

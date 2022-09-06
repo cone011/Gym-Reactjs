@@ -4,9 +4,10 @@ import { GetAllFormaComida } from "../../../lib/FormaComidaApi";
 import { getAllDays } from "../../../lib/DiaApi";
 import { SelectBox } from "devextreme-react/select-box";
 import { Modal } from "react-bootstrap";
+import { SearchList } from "../../../util/FindItem";
 
 const DietDetailForm = (props) => {
-  const { dietDetailObject, esNuevo } = props;
+  const { dietDetailObject, esNuevo, rowIndex } = props;
   const diaInputRef = useRef();
   const formaComidaInputRef = useRef();
   const conceptoInputRef = useRef();
@@ -14,11 +15,16 @@ const DietDetailForm = (props) => {
   const [listFormaComida, SetListFormaComida] = useState([]);
 
   const assigmentValue = useCallback(async () => {
+    if (!esNuevo) {
+      diaInputRef.current.value = dietDetailObject.IdDia;
+      formaComidaInputRef.current.value = dietDetailObject.IdFormaComida;
+      conceptoInputRef.current.value = dietDetailObject.Concepto;
+    }
     let diaList = await getAllDays();
     let formaComidaList = await GetAllFormaComida();
     SetListDia(diaList);
     SetListFormaComida(formaComidaList);
-  }, []);
+  }, [esNuevo, dietDetailObject]);
 
   useEffect(() => {
     assigmentValue();
@@ -26,24 +32,10 @@ const DietDetailForm = (props) => {
 
   const onSelectedDiaValueChanged = (valueChanged) => {
     diaInputRef.current.value = valueChanged.value;
-    /*let result = listDia.filter((item) => item.IdDia === valueChanged.value);
-    dietDetailObject = {
-      ...dietDetailObject,
-      IdDia: result[0].IdDia,
-      Dia: result[0].Dia,
-    };*/
   };
 
   const onSelectedFormaComidaValueChanged = (valueChanged) => {
     formaComidaInputRef.current.value = valueChanged.value;
-    /*let result = listFormaComida.filter(
-      (item) => item.IdFormaComida === valueChanged.value
-    );
-    dietDetailObject = {
-      ...dietDetailObject,
-      IdFormaComida: result[0].IdFormaComida,
-      FormaComida: result[0].FormaComida,
-    };*/
   };
 
   const saveDetail = () => {
@@ -56,11 +48,20 @@ const DietDetailForm = (props) => {
     if (conceptoInputRef.current.value === 0) {
       return;
     }
+    const diaSeleted = SearchList(listDia, "IdDia", diaInputRef.current.value);
+    const comidaSeleted = SearchList(
+      listFormaComida,
+      "IdFormaComida",
+      formaComidaInputRef.current.value
+    );
     props.saveDietDetail({
       IdDia: diaInputRef.current.value,
+      Dia: diaSeleted.Dia,
       IdFormaComida: formaComidaInputRef.current.value,
+      FormaComida: comidaSeleted.Nombre,
       Concepto: conceptoInputRef.current.value,
       esNuevo: esNuevo,
+      rowIndex: rowIndex,
     });
   };
 
@@ -81,6 +82,7 @@ const DietDetailForm = (props) => {
                 searchEnabled={true}
                 onValueChanged={onSelectedDiaValueChanged}
                 ref={diaInputRef}
+                defaultValue={esNuevo ? null : dietDetailObject.IdDia}
               />
             </div>
             <div className={classes.control}>
@@ -93,6 +95,7 @@ const DietDetailForm = (props) => {
                 searchEnabled={true}
                 onValueChanged={onSelectedFormaComidaValueChanged}
                 ref={formaComidaInputRef}
+                defaultValue={esNuevo ? null : dietDetailObject.IdFormaComida}
               />
             </div>
             <div className={classes.control}>

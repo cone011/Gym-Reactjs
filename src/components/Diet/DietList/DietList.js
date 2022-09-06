@@ -16,7 +16,20 @@ const DietList = (props) => {
   const history = useHistory();
 
   const newButtonHandler = () => {
-    history.push({ pathname: "/new-diet", state: { esNuevo: true } });
+    history.push({
+      pathname: "/new-diet",
+      state: {
+        esNuevo: true,
+        dietData: {
+          IdAlumno: null,
+          Almuno: null,
+          IdTrainner: null,
+          Trainner: null,
+          FechaCarga: null,
+          dietaDetalleList: [],
+        },
+      },
+    });
   };
 
   return (

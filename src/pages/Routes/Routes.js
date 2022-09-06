@@ -6,7 +6,8 @@ import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
 import TypeExcersiceFormPage from "../TypeExcersice/TypeExcersiceFormPage";
 import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
 import AllAlumno from "../Alumno/AllAlumno";
-import DietaForm from "../../components/Diet/DietForm/DietForm";
+import AllDiet from "../Diet/AllDiet";
+import DietFormPage from "../Diet/DietFormPage";
 const Routes = () => {
   return (
     <Switch>
@@ -40,8 +41,11 @@ const Routes = () => {
       <Route path="/alumno" exact>
         <AllAlumno />
       </Route>
+      <Route path="/diet" exact>
+        <AllDiet />
+      </Route>
       <Route path="/new-diet" exact>
-        <DietaForm esNuevo={true} dietData={{ dietaDetalleList: [] }} />
+        <DietFormPage />
       </Route>
     </Switch>
   );
