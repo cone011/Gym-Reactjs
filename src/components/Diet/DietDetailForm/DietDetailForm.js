@@ -54,7 +54,8 @@ const DietDetailForm = (props) => {
       "IdFormaComida",
       formaComidaInputRef.current.value
     );
-    props.saveDietDetail({
+
+    let sendDietDetailData = {
       IdDia: diaInputRef.current.value,
       Dia: diaSeleted.Dia,
       IdFormaComida: formaComidaInputRef.current.value,
@@ -62,6 +63,17 @@ const DietDetailForm = (props) => {
       Concepto: conceptoInputRef.current.value,
       esNuevo: esNuevo,
       rowIndex: rowIndex,
+    };
+
+    if (!esNuevo && dietDetailObject.IdDietaDetalle !== undefined) {
+      sendDietDetailData = {
+        ...sendDietDetailData,
+        IdDietaDetalle: dietDetailObject.IdDietaDetalle,
+      };
+    }
+
+    props.saveDietDetail({
+      ...sendDietDetailData,
     });
   };
 

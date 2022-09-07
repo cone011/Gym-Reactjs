@@ -9,6 +9,7 @@ import {
 import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
 import classes from "./DietForm.module.css";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
+import { GetDietDetailById } from "../../../lib/DietaDetalleApi";
 import { SelectBox } from "devextreme-react/select-box";
 import DietaDetailList from "../DietDetailList/DietDetailList";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
@@ -88,12 +89,22 @@ const DietaForm = (props) => {
 
   const assigmentValue = useCallback(async () => {
     if (!esNuevo) {
-      fechaInputRef.current.value = dietData.fecha;
-      alumnoInputRef.current.value = dietData.alumno;
+      fechaInputRef.current.value = new Date(dietData.FechaCarga)
+        .toISOString()
+        .substring(0, 10);
+      alumnoInputRef.current.value = dietData.Alumno;
+      dietData.dietaDetalleList = await GetDietDetailById(dietData.IdDieta);
+      httpSearch.alumnoDataSelected = {
+        IdAlumno: dietData.IdAlumno,
+        Nombre: dietData.Alumno,
+      };
+      trainnerInputRef.current.value = dietData.IdTrainner;
+    } else {
+      fechaInputRef.current.value = new Date().toISOString().substring(0, 10);
     }
     let response = await GetAllTrainner();
     SetTrainnerList(response);
-  }, [esNuevo, dietData]);
+  }, [esNuevo, dietData, httpSearch]);
 
   useEffect(() => {
     assigmentValue();
@@ -143,12 +154,21 @@ const DietaForm = (props) => {
     let sendDietData = {
       IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
       Alumno: httpSearch.alumnoDataSelected.Nombre,
-      FechaCarga: fechaInputRef.current.value,
+      FechaCarga: new Date(fechaInputRef.current.value)
+        .toISOString()
+        .substring(0, 10),
       IdTrainner: trainnerSeleceted.IdTrainner,
       Trainner: trainnerSeleceted.Nombre,
       DietaDetalleList: dietData.dietaDetalleList,
       esNuevo: esNuevo,
     };
+
+    if (!esNuevo) {
+      sendDietData = {
+        ...sendDietData,
+        IdDieta: dietData.IdDieta,
+      };
+    }
 
     props.OnsaveDiet({ ...sendDietData });
   };
@@ -206,10 +226,14 @@ const DietaForm = (props) => {
               displayExpr="Nombre"
               searchEnabled={true}
               ref={trainnerInputRef}
+              defaultValue={esNuevo ? null : dietData.IdTrainner}
               onValueChanged={onSelectedTrainnerChanged}
             />
           </div>
-          <DietaDetailList dietaDetalleList={dietData.dietaDetalleList} />
+          <DietaDetailList
+            dietaDetalleList={dietData.dietaDetalleList}
+            isEditable={true}
+          />
           <div className={classes.control}>
             <div className={classes.actions}>
               <button type="submit" className={classes.toggle}>

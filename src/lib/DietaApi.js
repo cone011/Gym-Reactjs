@@ -10,10 +10,10 @@ export async function GetAllDieta() {
   }
 
   const transformedData = [];
-  for (const key in data) {
+  for (const key in data.result) {
     const dietObject = {
       Id: key,
-      ...data[key],
+      ...data.result[key],
     };
     transformedData.push(dietObject);
   }

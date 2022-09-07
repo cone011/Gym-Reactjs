@@ -81,6 +81,17 @@ const DietaDetailList = (props) => {
         Concepto: dietDetailData.Concepto,
         esNuevo: dietDetailData.esNuevo,
       };
+
+      if (
+        dietDetailData.IdDieta !== undefined ||
+        dietDetailData.IdDietaDetalle !== undefined
+      ) {
+        props.dietaDetalleList[dietDetailData.rowIndex] = {
+          ...props.dietaDetalleList[dietDetailData.rowIndex],
+          IdDieta: dietDetailData.IdDieta,
+          IdDietaDetalle: dietDetailData.IdDietaDetalle,
+        };
+      }
     }
 
     dataGridRef.current.instance.refresh();
@@ -90,11 +101,13 @@ const DietaDetailList = (props) => {
     <Fragment>
       <div>
         <Card className={classes.tableCenteredDietDetail}>
-          <div className={classes.newDietField}>
-            <button type="button" onClick={onShowDietaDetail}>
-              Nuevo Detalle
-            </button>
-          </div>
+          {props.isEditable && (
+            <div className={classes.newDietField}>
+              <button type="button" onClick={onShowDietaDetail}>
+                Nuevo Detalle
+              </button>
+            </div>
+          )}
           <DataGrid
             dataSource={props.dietaDetalleList}
             allowColumnReordering={true}
@@ -112,11 +125,17 @@ const DietaDetailList = (props) => {
               dataType="string"
             />
             <Column dataField="Concepto" caption="Concepto" dataType="string" />
-            <Column type="buttons">
-              <Button name="editar" cssClass="btn" onClick={onModifyDietDetail}>
-                Editar
-              </Button>
-            </Column>
+            {props.isEditable && (
+              <Column type="buttons">
+                <Button
+                  name="editar"
+                  cssClass="btn"
+                  onClick={onModifyDietDetail}
+                >
+                  Editar
+                </Button>
+              </Column>
+            )}
           </DataGrid>
         </Card>
       </div>

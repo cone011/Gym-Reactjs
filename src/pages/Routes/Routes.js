@@ -47,6 +47,9 @@ const Routes = () => {
       <Route path="/new-diet" exact>
         <DietFormPage />
       </Route>
+      <Route path="/edit-diet" exact>
+        <DietFormPage />
+      </Route>
     </Switch>
   );
 };
