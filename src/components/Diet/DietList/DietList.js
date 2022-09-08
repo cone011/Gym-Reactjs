@@ -15,7 +15,6 @@ const DietList = (props) => {
   const history = useHistory();
 
   const editDietButtonHandler = (eventValue) => {
-    console.log(eventValue.row.data);
     history.push({
       pathname: "/edit-diet",
       state: {

@@ -1,4 +1,11 @@
-import { useReducer, useCallback, useEffect, useState, Fragment } from "react";
+import {
+  useReducer,
+  useCallback,
+  useEffect,
+  useState,
+  Fragment,
+  useRef,
+} from "react";
 import classes from "./RoutineForm.module.css";
 import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
@@ -49,17 +56,21 @@ const RoutineForm = (props) => {
 
   const assigmentValue = useCallback(async () => {
     if (!esNuevo) {
-      fechaInputRef.current.value = new Date(routineObject.FechaCarga)
+      fechaInputRef.current.value = new Date(routineObject.Fecha)
         .toISOString()
         .substring(0, 10);
       alumnoInputRef.current.value = routineObject.Alumno;
       trainnerInputRef.current.value = routineObject.IdTrainner;
+      httpSearch.alumnoDataSelected = {
+        IdAlumno: routineObject.IdAlumno,
+        Nombre: routineObject.Alumno,
+      };
     } else {
       fechaInputRef.current.value = new Date().toISOString().substring(0, 10);
     }
     let response = await GetAllTrainner();
     SetTrainnerList(response);
-  }, [esNuevo, routineObject]);
+  }, [esNuevo, routineObject, httpSearch]);
 
   useEffect(() => {
     assigmentValue();
@@ -82,11 +93,41 @@ const RoutineForm = (props) => {
     trainnerInputRef.current.value = valueChanged.value;
   };
 
+  const onSubmitFormHandler = (event) => {
+    event.preventDefault();
+
+    const trainnerSeleceted = SearchList(
+      listTrainner,
+      "IdTrainner",
+      trainnerInputRef.current.value
+    );
+
+    let sendDietData = {
+      IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
+      Alumno: httpSearch.alumnoDataSelected.Nombre,
+      Fecha: new Date(fechaInputRef.current.value)
+        .toISOString()
+        .substring(0, 10),
+      IdTrainner: trainnerSeleceted.IdTrainner,
+      Trainner: trainnerSeleceted.Nombre,
+      esNuevo: esNuevo,
+    };
+
+    if (!esNuevo) {
+      sendDietData = {
+        ...sendDietData,
+        IdRutina: routineObject.IdRutina,
+      };
+    }
+
+    props.onSaveRoutine({ ...sendDietData });
+  };
+
   return (
     <Fragment>
       <section className={classes.Routine}>
         <h1>{esNuevo ? "Nueva Rutina" : "Modificar Rutina"}</h1>
-        <form>
+        <form onSubmit={onSubmitFormHandler}>
           <div className={classes.control}>
             <label htmlFor="fecha">Fecha</label>
             <input type="date" id="fecha" required ref={fechaInputRef} />

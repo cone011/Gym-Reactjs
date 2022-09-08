@@ -111,7 +111,37 @@ export async function GetRutinaByDate(
   return transformedData;
 }
 
-export async function DeleteRutine(IdRutina) {
+export async function SaveRoutine(routineData) {
+  let urlApi = `${CALL_API_ROUTE}/Rutina`;
+  let method = "POST";
+
+  console.log(routineData);
+
+  if (!routineData.esNuevo) {
+    urlApi = `${urlApi}/${routineData.IdRutina}`;
+    method = "PUT";
+  }
+
+  const response = await fetch(urlApi, {
+    method: method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...routineData }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Could not save the routine data");
+  }
+
+  const responseObject = {
+    ...data,
+  };
+
+  return responseObject;
+}
+
+export async function DeleteRoutine(IdRutina) {
   const response = await fetch(`${CALL_API_ROUTE}/Rutina/${IdRutina}`, {
     method: "DELETE",
   });

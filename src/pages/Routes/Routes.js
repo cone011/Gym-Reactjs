@@ -8,6 +8,8 @@ import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
 import AllAlumno from "../Alumno/AllAlumno";
 import AllDiet from "../Diet/AllDiet";
 import DietFormPage from "../Diet/DietFormPage";
+import RoutineFormPage from "../Routine/RoutineFormPage";
+import AllRoutine from "../Routine/AllRoutine";
 const Routes = () => {
   return (
     <Switch>
@@ -49,6 +51,15 @@ const Routes = () => {
       </Route>
       <Route path="/edit-diet" exact>
         <DietFormPage />
+      </Route>
+      <Route path="/routine" exact>
+        <AllRoutine />
+      </Route>
+      <Route path="/new-routine" exact>
+        <RoutineFormPage />
+      </Route>
+      <Route path="/edit-routine" exact>
+        <RoutineFormPage />
       </Route>
     </Switch>
   );
