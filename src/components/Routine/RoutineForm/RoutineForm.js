@@ -9,9 +9,10 @@ import {
 import classes from "./RoutineForm.module.css";
 import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
-import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
+import { GetObjectByIdRutina } from "../../../lib/RoutineDetailApi";
 import { SearchList } from "../../../util/FindItem";
 import { SelectBox } from "devextreme-react/select-box";
+import RoutineDetailList from "../RoutineDetailList/RoutineDetailList";
 
 const searchReducer = (curSearch, action) => {
   switch (action.type) {
@@ -61,6 +62,9 @@ const RoutineForm = (props) => {
         .substring(0, 10);
       alumnoInputRef.current.value = routineObject.Alumno;
       trainnerInputRef.current.value = routineObject.IdTrainner;
+      routineObject.routineDetalleList = await GetObjectByIdRutina(
+        routineObject.IdRutina
+      );
       httpSearch.alumnoDataSelected = {
         IdAlumno: routineObject.IdAlumno,
         Nombre: routineObject.Alumno,
@@ -110,6 +114,7 @@ const RoutineForm = (props) => {
         .substring(0, 10),
       IdTrainner: trainnerSeleceted.IdTrainner,
       Trainner: trainnerSeleceted.Nombre,
+      RutinaDetalle: routineObject.routineDetalleList,
       esNuevo: esNuevo,
     };
 
@@ -167,6 +172,10 @@ const RoutineForm = (props) => {
               onValueChanged={onSelectedTrainnerChanged}
             />
           </div>
+          <RoutineDetailList
+            routineDetalleList={routineObject.routineDetalleList}
+            isEditable={true}
+          />
           <div className={classes.control}>
             <div className={classes.actions}>
               <button type="submit" className={classes.toggle}>

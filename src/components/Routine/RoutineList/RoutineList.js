@@ -37,6 +37,7 @@ const RoutineList = (props) => {
           IdTrainner: null,
           Trainner: null,
           Fecha: null,
+          routineDetalleList: [],
         },
       },
     });

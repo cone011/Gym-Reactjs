@@ -40,7 +40,7 @@ export async function GetObjectByIdRutinaDetalle(IdRutinaDetalle) {
   return routineDetailObject;
 }
 
-export async function GetObjectByIdRutinaDetalle(IdRutina) {
+export async function GetObjectByIdRutina(IdRutina) {
   const response = await fetch(`${CALL_API_ROUTE}/RutinaBase/${IdRutina}`);
 
   const data = await response.json();

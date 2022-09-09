@@ -16,9 +16,10 @@ const RoutineDetailForm = (props) => {
 
   const assigmentValue = useCallback(async () => {
     if (!esNuevo) {
-      diaInputRef.current.value = dietDetailObject.IdDia;
-      ejercicioInputRef.current.value = dietDetailObject.IdEjercicio;
-      observacionInputRef.current.value = dietDetailObject.Concepto;
+      console.log(routineDetailObject);
+      diaInputRef.current.value = routineDetailObject.IdDia;
+      ejercicioInputRef.current.value = routineDetailObject.IdEjercicio;
+      observacionInputRef.current.value = routineDetailObject.Concepto;
     }
     let diaList = await getAllDays();
     let ejercicioList = await getAllExcersice();
@@ -55,25 +56,25 @@ const RoutineDetailForm = (props) => {
       ejercicioInputRef.current.value
     );
 
-    let sendDietDetailData = {
-      IdDia: diaInputRef.current.value,
+    let sendRutineDetailData = {
+      IdDia: diaSeleted.IdDia,
       Dia: diaSeleted.Dia,
-      IdEjercicio: ejercicioSeleted.current.value,
+      IdEjercicio: ejercicioSeleted.IdEjercicio,
       Ejercicio: ejercicioSeleted.Nombre,
-      Concepto: observacionInputRef.current.value,
+      Observacion: observacionInputRef.current.value,
       esNuevo: esNuevo,
       rowIndex: rowIndex,
     };
 
     if (!esNuevo && routineDetailObject.IdRutinaDetalle !== undefined) {
-      sendDietDetailData = {
-        ...sendDietDetailData,
+      sendRutineDetailData = {
+        ...sendRutineDetailData,
         IdRutinaDetalle: routineDetailObject.IdRutinaDetalle,
       };
     }
 
-    props.saveDietDetail({
-      ...sendDietDetailData,
+    props.saveRoutineDetail({
+      ...sendRutineDetailData,
     });
   };
 
