@@ -46,9 +46,11 @@ const RoutineList = (props) => {
   return (
     <div>
       <Card className={classes.tableCenteredRoutine}>
-        <div className={classes.newRoutine} onClick={newButtonHandler}>
-          <button>Nueva Rutina</button>
-        </div>
+        {props.isEditable && (
+          <div className={classes.newRoutine} onClick={newButtonHandler}>
+            <button>Nueva Rutina</button>
+          </div>
+        )}
         <DataGrid
           dataSource={props.routineList}
           allowColumnReordering={true}
@@ -63,11 +65,13 @@ const RoutineList = (props) => {
           <Column dataField="Alumno" caption="Alumno" dataType="string" />
           <Column dataField="Trainner" caption="Trainner" dataType="string" />
           <Column dataField="Fecha" caption="Fecha" dataType="date" />
-          <Column type="buttons">
-            <Button cssClass="btn" name="editar" onClick={editButtonHandler}>
-              Editar
-            </Button>
-          </Column>
+          {props.isEditable && (
+            <Column type="buttons">
+              <Button cssClass="btn" name="editar" onClick={editButtonHandler}>
+                Editar
+              </Button>
+            </Column>
+          )}
         </DataGrid>
       </Card>
     </div>

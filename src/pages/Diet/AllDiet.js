@@ -23,7 +23,7 @@ const AllDiet = () => {
     return <p className="centered focused">{error}</p>;
   }
 
-  return <DietList dietList={loadedDiet} />;
+  return <DietList dietList={loadedDiet} isEditable={true} />;
 };
 
 export default AllDiet;

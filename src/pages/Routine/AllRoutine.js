@@ -28,7 +28,7 @@ const AllRoutine = () => {
     return <p className="centered focused">{error}</p>;
   }
 
-  return <RoutineList routineList={loadedRoutine} />;
+  return <RoutineList routineList={loadedRoutine} isEditable={true} />;
 };
 
 export default AllRoutine;

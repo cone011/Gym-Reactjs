@@ -57,9 +57,11 @@ const DietList = (props) => {
   return (
     <div>
       <Card className={classes.tableCenteredDiet}>
-        <div className={classes.newDiet} onClick={newButtonHandler}>
-          <button>Nueva Dieta</button>
-        </div>
+        {props.isEditable && (
+          <div className={classes.newDiet} onClick={newButtonHandler}>
+            <button>Nueva Dieta</button>
+          </div>
+        )}
         <DataGrid
           dataSource={props.dietList}
           allowColumnReordering={true}
@@ -74,15 +76,17 @@ const DietList = (props) => {
           <Column dataField="Alumno" caption="Alumno" dataType="string" />
           <Column dataField="Trainner" caption="Trainner" dataType="string" />
           <Column dataField="FechaCarga" caption="Fecha" dataType="date" />
-          <Column type="buttons">
-            <Button
-              name="editar"
-              cssClass="btn"
-              onClick={editDietButtonHandler}
-            >
-              Editar
-            </Button>
-          </Column>
+          {props.isEditable && (
+            <Column type="buttons">
+              <Button
+                name="editar"
+                cssClass="btn"
+                onClick={editDietButtonHandler}
+              >
+                Editar
+              </Button>
+            </Column>
+          )}
         </DataGrid>
       </Card>
     </div>
