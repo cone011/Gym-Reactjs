@@ -28,7 +28,11 @@ const UserList = (props) => {
             visible={false}
           />
           <Column dataField="User" caption="User." dataType="string" />
-          <Column dataField="EsTrainner" caption="Trainner." dataType="bit" />
+          <Column
+            dataField="EsTrainner"
+            caption="Trainner."
+            dataType="boolean"
+          />
           {!props.isSearching && (
             <Column type="buttons">
               <Button name="editar" cssClass="btn">

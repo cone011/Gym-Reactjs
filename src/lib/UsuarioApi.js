@@ -38,6 +38,26 @@ export async function GetObjectByIdUsuario(IdUsuario) {
   return userObject;
 }
 
+export async function GetValidUsuario(Usuario, Password) {
+  const response = await fetch(`${CALL_API_ROUTE}/valid-usuario`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ Usuario: Usuario, Contraseña: Password }),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Could not fetch this user login");
+  }
+
+  const userReponse = {
+    ...data.result,
+  };
+
+  return userReponse;
+}
+
 export async function saveUsuario(userData) {
   let urlApi = `${CALL_API_ROUTE}/Usuario`;
   let method = "POST";
