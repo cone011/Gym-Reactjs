@@ -11,13 +11,17 @@ import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
 import DietList from "../../Diet/DietList/DietList";
 import RoutineList from "../../Routine/RoutineList/RoutineList";
+import SearchAlumno from "../SearchAlumno/SearchAlumno";
 import { GetRutinaByDate } from "../../../lib/RoutineApi";
+import { SearchList } from "../../../util/FindItem";
+import { SelectBox } from "devextreme-react/select-box";
 
 const searchReducer = (curSearching, action) => {
   switch (action.type) {
     case "BEGIN":
       return {
         isSearching: false,
+        showFilter: action.showFilter,
         error: false,
         message: null,
         isShowing: false,
@@ -43,6 +47,35 @@ const searchReducer = (curSearching, action) => {
   }
 };
 
+const alumnoSearchReducer = (curAlumno, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return {
+        isShowingSearch: true,
+        error: false,
+        message: null,
+        alumnoDataSelected: null,
+      };
+    case "ERROR":
+      return {
+        ...curAlumno,
+        isShowingSearch: false,
+        error: true,
+        message: action.message,
+      };
+    case "CLOSED":
+      return { ...curAlumno, isShowingSearch: false };
+    case "END":
+      return {
+        ...curAlumno,
+        isShowingSearch: false,
+        alumnoDataSelected: action.alumnoDataSelected,
+      };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
 const Searching = (props) => {
   const { typeSearching } = props;
   const fechaInicioInputRef = useRef();
@@ -51,13 +84,37 @@ const Searching = (props) => {
   const trainnerInputRef = useRef();
   const [httpSearching, dispatchSearching] = useReducer(searchReducer, {
     isSearching: false,
+    showFilter: false,
     error: false,
     message: null,
     isShowing: false,
     typeSearching: null,
     dataShow: null,
   });
+  const [httpAlumno, dispatchAlumno] = useReducer(alumnoSearchReducer, {
+    isShowingSearch: false,
+    error: false,
+    message: null,
+    alumnoDataSelected: null,
+  });
   const [listTrainner, SetListTrainner] = useState([]);
+
+  const onShowSearchAlumno = () => {
+    dispatchAlumno({ type: "BEGIN" });
+  };
+
+  const modalShowHandler = () => {
+    dispatchAlumno({ type: "CLOSED" });
+  };
+
+  const onSelectedTrainnerChanged = (valueChanged) => {
+    trainnerInputRef.current.value = valueChanged.value;
+  };
+
+  const onAlumnoSelected = (alumnoDataSelected) => {
+    alumnoInputRef.current.value = alumnoDataSelected.Nombre;
+    dispatchAlumno({ type: "END", alumnoDataSelected: alumnoDataSelected });
+  };
 
   const loadedTrainner = useCallback(async () => {
     fechaInicioInputRef.current.value = new Date()
@@ -71,11 +128,19 @@ const Searching = (props) => {
   const assigmentValues = useCallback(async () => {
     switch (typeSearching) {
       case "DIET":
-        dispatchSearching({ type: "BEGIN", typeSearching: typeSearching });
+        dispatchSearching({
+          type: "BEGIN",
+          typeSearching: typeSearching,
+          showFilter: true,
+        });
         loadedTrainner();
         break;
       case "ROUTINE":
-        dispatchSearching({ type: "BEGIN", typeSearching: typeSearching });
+        dispatchSearching({
+          type: "BEGIN",
+          typeSearching: typeSearching,
+          showFilter: true,
+        });
         loadedTrainner();
         break;
       case "STUDENT":
@@ -101,11 +166,24 @@ const Searching = (props) => {
       .toISOString()
       .substring(0, 10);
 
-    console.log(fechaInicio);
-
-    console.log(fechaFin);
-
     let result;
+
+    let IdAlumno = null;
+    let IdTrainner = null;
+
+    if (httpAlumno.alumnoDataSelected) {
+      IdAlumno = httpAlumno.alumnoDataSelected.IdAlumno;
+    }
+
+    if (trainnerInputRef.current.value > 0) {
+      const trainnerSeleceted = SearchList(
+        listTrainner,
+        "IdTrainner",
+        trainnerInputRef.current.value
+      );
+
+      IdTrainner = trainnerSeleceted.IdTrainner;
+    }
 
     switch (httpSearching.typeSearching) {
       case "DIET":
@@ -115,7 +193,12 @@ const Searching = (props) => {
         });
         break;
       case "ROUTINE":
-        result = await GetRutinaByDate(fechaInicio, fechaFin, null, null);
+        result = await GetRutinaByDate(
+          fechaInicio,
+          fechaFin,
+          IdAlumno,
+          IdTrainner
+        );
         dispatchSearching({
           type: "END",
           dataShow: <RoutineList routineList={result} isEditable={false} />,
@@ -150,6 +233,41 @@ const Searching = (props) => {
             ref={fechaFinInputRef}
           />
         </div>
+        {httpSearching.showFilter && (
+          <div className={classes.control}>
+            <label htmlFor="alumno">Alumno</label>
+            <input
+              type="text"
+              id="alumno"
+              readOnly
+              disabled
+              ref={alumnoInputRef}
+            />
+            <div className={classes.actionsSearch}>
+              <button
+                type="button"
+                onClick={onShowSearchAlumno}
+                className={classes.toggle}
+              >
+                Buscar Alumno
+              </button>
+            </div>
+          </div>
+        )}
+        {httpSearching.showFilter && (
+          <div className={classes.control}>
+            <label htmlFor="trainner">Trainner</label>
+            <SelectBox
+              dataSource={listTrainner}
+              placeholder="Seleccione un trainner"
+              valueExpr="IdTrainner"
+              displayExpr="Nombre"
+              searchEnabled={true}
+              ref={trainnerInputRef}
+              onValueChanged={onSelectedTrainnerChanged}
+            />
+          </div>
+        )}
         <div className={classes.control}>
           <div className={classes.actions}>
             <button
@@ -162,6 +280,13 @@ const Searching = (props) => {
           </div>
         </div>
       </section>
+      {httpAlumno.isShowingSearch && (
+        <SearchAlumno
+          showModal={httpAlumno.isShowingSearch}
+          modalHandler={modalShowHandler}
+          onAlumnoSelectedValue={onAlumnoSelected}
+        />
+      )}
       {httpSearching.isSearching && <LoadingSpinner />}
       {!httpSearching.isSearching &&
         !httpSearching.error &&

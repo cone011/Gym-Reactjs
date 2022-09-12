@@ -11,6 +11,7 @@ import DietFormPage from "../Diet/DietFormPage";
 import RoutineFormPage from "../Routine/RoutineFormPage";
 import AllRoutine from "../Routine/AllRoutine";
 import Searching from "../../components/Search/Searching/Searching";
+import AlumnoFormPage from "../Alumno/AlumnoFormPage";
 const Routes = () => {
   return (
     <Switch>
@@ -64,6 +65,12 @@ const Routes = () => {
       </Route>
       <Route path="/search-diet" exact>
         <Searching typeSearching={"DIET"} />
+      </Route>
+      <Route path="/search-routine" exact>
+        <Searching typeSearching={"ROUTINE"} />
+      </Route>
+      <Route path="/new-alumno" exact>
+        <AlumnoFormPage />
       </Route>
     </Switch>
   );

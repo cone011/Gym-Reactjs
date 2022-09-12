@@ -1,6 +1,6 @@
 .searching {
   margin: 3rem auto;
-  width: 50%;
+  width: 35%;
   border-radius: 6px;
   background-color: #000000;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
@@ -67,6 +67,40 @@
 }
 
 .actions .toggle:hover {
+  background-color: transparent;
+  color: #b4b4b4;
+}
+
+.actionsSearch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.actionsSearch button {
+  cursor: pointer;
+  font: inherit;
+  color: rgb(8, 8, 8);
+  background-color: #ececec;
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+  padding: 0.5rem 2.5rem;
+}
+
+.actionsSearch button:hover {
+  background-color: #030303;
+  border-color: #f3f3f3;
+}
+
+.actionsSearch .toggle {
+  margin-top: 1rem;
+  background-color: transparent;
+  color: #f0f0f0;
+  border: none;
+  padding: 0.15rem 1.5rem;
+}
+
+.actionsSearch .toggle:hover {
   background-color: transparent;
   color: #b4b4b4;
 }

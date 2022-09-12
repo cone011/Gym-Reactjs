@@ -10,10 +10,10 @@ export async function GetAllAlumno() {
 
   const transformedData = [];
 
-  for (const key in data) {
+  for (const key in data.result) {
     const objectAlumno = {
       id: key,
-      ...data[key],
+      ...data.result[key],
     };
     transformedData.push(objectAlumno);
   }

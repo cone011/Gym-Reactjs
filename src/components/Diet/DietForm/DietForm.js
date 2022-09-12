@@ -193,7 +193,13 @@ const DietaForm = (props) => {
         <form onSubmit={dietFormHandler}>
           <div className={classes.control}>
             <label htmlFor="fecha">Fecha</label>
-            <input type="date" id="fecha" required ref={fechaInputRef} />
+            <input
+              type="date"
+              pattern="\d{4}-\d{2}-\d{2}"
+              id="fecha"
+              required
+              ref={fechaInputRef}
+            />
           </div>
 
           <div className={classes.control}>
