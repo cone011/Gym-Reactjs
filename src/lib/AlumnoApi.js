@@ -71,7 +71,7 @@ export async function SaveAlumno(alumnoData) {
 
   const response = await fetch(urlApi, {
     method: method,
-    "Content-Type": "application/json",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ...alumnoData }),
   });
 

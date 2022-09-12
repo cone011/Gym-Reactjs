@@ -12,6 +12,7 @@ import RoutineFormPage from "../Routine/RoutineFormPage";
 import AllRoutine from "../Routine/AllRoutine";
 import Searching from "../../components/Search/Searching/Searching";
 import AlumnoFormPage from "../Alumno/AlumnoFormPage";
+import AllUsers from "../Users/AllUsers";
 const Routes = () => {
   return (
     <Switch>
@@ -71,6 +72,12 @@ const Routes = () => {
       </Route>
       <Route path="/new-alumno" exact>
         <AlumnoFormPage />
+      </Route>
+      <Route path="/edit-alumno" exact>
+        <AlumnoFormPage />
+      </Route>
+      <Route path="/users" exact>
+        <AllUsers />
       </Route>
     </Switch>
   );

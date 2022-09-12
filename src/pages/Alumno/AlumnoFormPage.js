@@ -24,7 +24,7 @@ const AlumnoFormPage = () => {
     <AlumnoForm
       alumnoObject={location.state.alumnoObject}
       esNuevo={location.state.esNuevo}
-      IdUsuario={location.state.IdUsuario}
+      IdUsuario={1} //{location.state.IdUsuario}
       onSaveAlumnoHandler={saveAlumnoHandler}
     />
   );

@@ -1,4 +1,3 @@
-import React from "react";
 import classes from "./AlumnoList.module.css";
 import DataGrid, {
   Column,
@@ -8,15 +7,50 @@ import DataGrid, {
   Button,
 } from "devextreme-react/data-grid";
 import Card from "../../UI/Card/Card";
+import { useHistory } from "react-router-dom";
 
 const AlumnoList = (props) => {
-  const selectedValueHandler = (eventValue) => {
-    props.onValueSelected({ ...eventValue.row.data });
+  const history = useHistory();
+
+  const newButtonHandler = () => {
+    history.push({
+      pathname: "/new-alumno",
+      state: {
+        esNuevo: true,
+        alumnoObject: {
+          IdAlumno: null,
+          Nombre: null,
+          FechaNacimiento: null,
+          Cedula: null,
+          Edad: null,
+          Direccion: null,
+          Telefono: null,
+          Email: null,
+        },
+      },
+    });
+  };
+
+  const editValueHandler = (eventValue) => {
+    history.push({
+      pathname: "/edit-alumno",
+      state: {
+        esNuevo: false,
+        alumnoObject: {
+          ...eventValue.row.data,
+        },
+      },
+    });
   };
 
   return (
     <div>
       <Card className={classes.tableCenteredAlumno}>
+        {!props.isSearching && (
+          <div className={classes.newAlumno} onClick={newButtonHandler}>
+            <button>Nueva Alumno</button>
+          </div>
+        )}
         <DataGrid
           dataSource={props.alumnoData}
           allowColumnReordering={true}
@@ -46,14 +80,10 @@ const AlumnoList = (props) => {
           {!props.isSearching && (
             <Column dataField="Email" caption="Email" dataType="string" />
           )}
-          {props.isSearching && (
+          {!props.isSearching && (
             <Column type="buttons">
-              <Button
-                name="editar"
-                cssClass="btn"
-                onClick={selectedValueHandler}
-              >
-                Seleccionar
+              <Button name="editar" cssClass="btn" onClick={editValueHandler}>
+                Editar
               </Button>
             </Column>
           )}

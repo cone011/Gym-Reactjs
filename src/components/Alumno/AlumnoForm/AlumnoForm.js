@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
 import classes from "./AlumnoForm.module.css";
+import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 
 const alumnoReducer = (curAlumno, action) => {
   switch (action.type) {
@@ -7,8 +8,6 @@ const alumnoReducer = (curAlumno, action) => {
       return { isShowing: true, error: false, message: null };
     case "ERROR":
       return { isShowing: false, error: true, message: action.message };
-    case "CLOSED":
-      return { ...curAlumno, isShowing: false };
     case "END":
       return { ...curAlumno, isShowing: false };
     default:
@@ -33,13 +32,19 @@ const AlumnoForm = (props) => {
 
   const assigmentValues = useCallback(() => {
     if (!esNuevo) {
-      nameInputRef.current.value = alumnoObject.name;
-      cedulaInputRef.current.value = alumnoObject.cedula;
-      fechaNacInputRef.current.value = alumnoObject.fechaNacmiento;
-      edadInputRef.current.value = alumnoObject.edad;
-      direccionInputRef.current.value = alumnoObject.direccion;
-      telefonoInputRef.current.value = alumnoObject.telefono;
-      emailInputRef.current.value = alumnoObject.email;
+      nameInputRef.current.value = alumnoObject.Nombre;
+      cedulaInputRef.current.value = alumnoObject.Cedula;
+      fechaNacInputRef.current.value = new Date(alumnoObject.FechaNacimiento)
+        .toISOString()
+        .substring(0, 10);
+      edadInputRef.current.value = alumnoObject.Edad;
+      direccionInputRef.current.value = alumnoObject.Direccion;
+      telefonoInputRef.current.value = alumnoObject.Telefono;
+      emailInputRef.current.value = alumnoObject.Email;
+    } else {
+      fechaNacInputRef.current.value = new Date()
+        .toISOString()
+        .substring(0, 10);
     }
   }, [esNuevo, alumnoObject]);
 
@@ -93,6 +98,7 @@ const AlumnoForm = (props) => {
       Telefono: telefonoInputRef.current.value,
       Email: emailInputRef.current.value,
       IdUsuario: IdUsuario,
+      esNuevo: esNuevo,
     };
 
     if (!esNuevo) {
@@ -102,9 +108,9 @@ const AlumnoForm = (props) => {
       };
     }
 
-    dispatchAlumno({ type: "END " });
+    dispatchAlumno({ type: "END" });
 
-    props.onAddAlumno({
+    props.onSaveAlumnoHandler({
       ...sendDataObject,
     });
   };
@@ -137,10 +143,6 @@ const AlumnoForm = (props) => {
             <input type="number" id="edad" required ref={edadInputRef} />
           </div>
           <div className={classes.control}>
-            <label htmlFor="edad">Edad</label>
-            <input type="number" id="edad" required ref={edadInputRef} />
-          </div>
-          <div className={classes.control}>
             <label htmlFor="email">Email</label>
             <input type="email" id="email" required ref={emailInputRef} />
           </div>
@@ -161,6 +163,7 @@ const AlumnoForm = (props) => {
           </div>
         </form>
       </section>
+      {httpAlumno.isShowing && <LoadingSpinner />}
     </Fragment>
   );
 };
