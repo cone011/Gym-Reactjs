@@ -1,7 +1,9 @@
-import { Fragment, useCallback, useReducer, useRef } from "react";
+import { Fragment, useContext, useReducer, useRef } from "react";
+import { useHistory } from "react-router-dom";
 import classes from "./AuthForm.module.css";
 import LoadingSpinner from "../UI/LoadingSpinner/LoadingSpinner";
 import { GetValidUsuario } from "../../lib/UsuarioApi";
+import AuthContext from "../../store/auth-context";
 
 const authReducer = (curAuth, actions) => {
   switch (actions.type) {
@@ -19,6 +21,8 @@ const authReducer = (curAuth, actions) => {
 };
 
 const AuthForm = () => {
+  const history = useHistory();
+  const authCtx = useContext(AuthContext);
   const userInputRef = useRef();
   const passwordInputRef = useRef();
   const [httpAuth, dispatchAuth] = useReducer(authReducer, {
@@ -26,7 +30,7 @@ const AuthForm = () => {
     error: false,
     message: null,
   });
-  const submitHandler = useCallback(async (event) => {
+  const submitHandler = async (event) => {
     event.preventDefault();
 
     dispatchAuth({ type: "BEGIN" });
@@ -53,10 +57,16 @@ const AuthForm = () => {
 
     const response = await GetValidUsuario(usuario, password);
 
-    console.log(response);
+    const expirationTime = new Date(new Date().getTime() + +3 * 1000);
+
+    console.log(expirationTime);
+
+    //authCtx.login(response.token, response);
 
     dispatchAuth({ type: "END" });
-  }, []);
+
+    //   history.replace("/diet");
+  };
 
   return (
     <Fragment>

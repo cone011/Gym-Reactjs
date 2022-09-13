@@ -54,7 +54,6 @@ const ExcersiceForm = (props) => {
       descriptionInputForm.current.value = excersiceObject.Nombre;
       IdTipoEjercicioInputForm.current.value = excersiceObject.IdTipoEjercicio;
       httpImage.imgExcersice = excersiceObject.ImagenUrl;
-      console.log(httpImage.imgExcersice);
     }
   }, [esNuevo, excersiceObject, httpImage]);
 

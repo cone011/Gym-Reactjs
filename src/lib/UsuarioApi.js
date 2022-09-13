@@ -53,6 +53,7 @@ export async function GetValidUsuario(Usuario, Password) {
 
   const userReponse = {
     ...data.result,
+    token: data.token,
   };
 
   return userReponse;
