@@ -57,15 +57,11 @@ const AuthForm = () => {
 
     const response = await GetValidUsuario(usuario, password);
 
-    const expirationTime = new Date(new Date().getTime() + +3 * 1000);
-
-    console.log(expirationTime);
-
-    //authCtx.login(response.token, response);
+    authCtx.login(response.token, response);
 
     dispatchAuth({ type: "END" });
 
-    //   history.replace("/diet");
+    history.replace("/diet");
   };
 
   return (
