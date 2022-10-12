@@ -19,6 +19,7 @@ import DataGrid, {
   FilterRow,
   Button,
 } from "devextreme-react/data-grid";
+import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
 
 const deleteReducer = (curDelete, action) => {
   switch (action.type) {
@@ -94,6 +95,12 @@ const TypeExcersiceList = (props) => {
     if (httpDelete.isShowing) {
       dispatchDelete({ type: "CLOSED" });
     }
+  };
+
+  const onModalErrorHandler = () => {
+    if (httpDelete.error) {
+      dispatchDelete({ type: "CLOSED" });
+    }
     if (httpLoading.error) {
       dispatchLoading({ type: "CLOSED" });
     }
@@ -116,7 +123,7 @@ const TypeExcersiceList = (props) => {
         message: "No se pudo eliminar este registro",
       });
     }
-  }, []);
+  }, [listType]);
 
   return (
     <Fragment>
@@ -168,10 +175,17 @@ const TypeExcersiceList = (props) => {
           </DataGrid>
         </Card>
       </div>
-      {(httpDelete.isShowing || httpLoading.error) && (
+      {(httpDelete.error || httpLoading.error) && (
+        <ErrorMessage
+          showModal={httpDelete.error}
+          modalHandler={onModalErrorHandler}
+          message={httpDelete.message}
+        />
+      )}
+      {httpDelete.isShowing && (
         <DeleteMessage
-          showModal={httpDelete.isShowing || httpLoading.error}
-          message={httpDelete.message || httpLoading.message}
+          showModal={httpDelete.isShowing}
+          message={httpDelete.message}
           modalHandler={onModalDeleteHandler}
           onEliminar={onDeleteHanlder}
         />

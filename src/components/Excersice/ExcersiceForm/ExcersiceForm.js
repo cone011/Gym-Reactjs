@@ -1,7 +1,34 @@
-import { useRef, useEffect, useCallback, useReducer, useState } from "react";
+import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
 import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
+import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+
+const tipoEjercicioReducer = (curTipoEjercicio, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { error: false, message: null, objectType: null };
+    case "ERROR":
+      return { ...curTipoEjercicio, error: true, message: action.message };
+    case "END":
+      return { ...curTipoEjercicio, objectType: action.objectType };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const errorReducer = (curError, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { error: false, message: null };
+    case "ERROR":
+      return { error: true, message: action.message };
+    case "END":
+      return { ...curError, error: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const imageReducer = (curImageState, action) => {
   switch (action.type) {
@@ -46,7 +73,15 @@ const ExcersiceForm = (props) => {
     imgExcersice: null,
     imgSend: null,
   });
-  const [TipoEjercicio, SetTipoEjercicio] = useState("");
+  const [httpError, dispatchError] = useReducer(errorReducer, {
+    error: false,
+    message: null,
+  });
+  const [httpType, dispatchType] = useReducer(tipoEjercicioReducer, {
+    error: false,
+    message: null,
+    objectType: null,
+  });
 
   const assigmentsValues = useCallback(() => {
     if (!esNuevo) {
@@ -62,11 +97,18 @@ const ExcersiceForm = (props) => {
   }, [assigmentsValues]);
 
   const onSelectedValueChanged = (valueChanged) => {
+    dispatchType({ type: "BEGIN" });
     IdTipoEjercicioInputForm.current.value = valueChanged.value;
     const typeObject = props.listType.find(
       (item) => item.IdTipoEjercicio === valueChanged.value
     );
-    SetTipoEjercicio(typeObject.Nombre);
+    if (!typeObject) {
+      dispatchType({
+        type: "ERROR",
+        message: "No se encontro ningun tipo de ejercicio",
+      });
+    }
+    dispatchType({ type: "END", objectType: typeObject });
   };
 
   const onSelectedFileChanged = (value) => {
@@ -88,84 +130,116 @@ const ExcersiceForm = (props) => {
   const excersiceSubmitHandler = (event) => {
     event.preventDefault();
 
-    let IdEjercicio = null;
-    const code = codeInputForm.current.value;
-    const description = descriptionInputForm.current.value;
-    const IdTipoEjercicio = IdTipoEjercicioInputForm.current.value;
+    dispatchError({ type: "BEGIN" });
 
-    if (!esNuevo) {
-      IdEjercicio = excersiceObject.IdEjercicio;
+    if (codeInputForm.current.value.trim().lenght === 0) {
+      dispatchError({
+        type: "ERROR",
+        message: "No se encuentra asignado un codigo al registro",
+      });
     }
 
+    if (descriptionInputForm.current.value.trim().lenght === 0) {
+      dispatchError({
+        type: "ERROR",
+        message: "No se encuentra cargado una descripcion",
+      });
+    }
+
+    if (IdTipoEjercicioInputForm.current.value === 0) {
+      dispatchError({
+        type: "ERROR",
+        message: "No se encuentra asignado un tipo de ejercicio al registro",
+      });
+    }
+
+    dispatchError({ type: "END" });
+
     const formData = new FormData();
-    formData.append("Codigo", code);
-    formData.append("Nombre", description);
-    formData.append("IdTipoEjercicio", IdTipoEjercicio);
-    formData.append("TipoEjercicio", TipoEjercicio);
-    formData.append("IdEjercicio", IdEjercicio);
+    formData.append("Codigo", codeInputForm.current.value);
+    formData.append("Nombre", descriptionInputForm.current.value);
+    formData.append("IdTipoEjercicio", httpType.IdTipoEjercicio);
+    formData.append("TipoEjercicio", httpType.TipoEjercicio);
     formData.append("esNuevo", esNuevo);
     formData.append("image", httpImage.imgSend);
+
+    if (!esNuevo) {
+      formData.append("IdEjercicio", excersiceObject.IdEjercicio);
+    }
 
     props.onSaveExcersice(formData);
   };
 
+  const onModalErrorHandler = () => {
+    dispatchError({ type: "CLOSED" });
+  };
+
   return (
-    <section className={classes.Excersice}>
-      <h1>{props.esNuevo ? "Nuevo ejercicio" : "Modificar ejercicio"}</h1>
-      <form onSubmit={excersiceSubmitHandler}>
-        <div className={classes.control}>
-          <label htmlFor="code">Codigo</label>
-          <input type="text" id="code" required ref={codeInputForm} />
-        </div>
-        <div className={classes.control}>
-          <label htmlFor="description">Descripcion</label>
-          <input
-            type="text"
-            id="description"
-            required
-            ref={descriptionInputForm}
-          />
-        </div>
-        <div className={classes.control}>
-          <label htmlFor="type">Tipo Ejercicio</label>
-          <SelectBox
-            dataSource={props.listType}
-            placeholder="Seleccione un tipo de ejercicio"
-            valueExpr="IdTipoEjercicio"
-            displayExpr="Nombre"
-            searchEnabled={true}
-            defaultValue={esNuevo ? null : excersiceObject.TipoEjercicio}
-            onValueChanged={onSelectedValueChanged}
-            ref={IdTipoEjercicioInputForm}
-          />
-        </div>
-        <div className={classes.control}>
-          <label htmlFor="imagen">Imagen</label>
-          <input
-            type="file"
-            className="form-control"
-            id="image"
-            required
-            onChange={onSelectedFileChanged}
-          />
-        </div>
-        <div className={classes.control}>
-          {httpImage.loading && <LoadingSpinner />}
-          {!httpImage.loading && !httpImage.error && httpImage.isShow && (
-            <div className={classes.holder}>
-              <img src={httpImage.imgExcersice} alt="img" />
-            </div>
-          )}
-        </div>
-        <div className={classes.control}>
-          <div className={classes.actions}>
-            <button type="submit" className={classes.toggle}>
-              Guardar
-            </button>
+    <Fragment>
+      <section className={classes.Excersice}>
+        <h1>{props.esNuevo ? "Nuevo ejercicio" : "Modificar ejercicio"}</h1>
+        <form onSubmit={excersiceSubmitHandler}>
+          <div className={classes.control}>
+            <label htmlFor="code">Codigo</label>
+            <input type="text" id="code" required ref={codeInputForm} />
           </div>
-        </div>
-      </form>
-    </section>
+          <div className={classes.control}>
+            <label htmlFor="description">Descripcion</label>
+            <input
+              type="text"
+              id="description"
+              required
+              ref={descriptionInputForm}
+            />
+          </div>
+          <div className={classes.control}>
+            <label htmlFor="type">Tipo Ejercicio</label>
+            <SelectBox
+              dataSource={props.listType}
+              placeholder="Seleccione un tipo de ejercicio"
+              valueExpr="IdTipoEjercicio"
+              displayExpr="Nombre"
+              searchEnabled={true}
+              defaultValue={esNuevo ? null : excersiceObject.TipoEjercicio}
+              onValueChanged={onSelectedValueChanged}
+              ref={IdTipoEjercicioInputForm}
+            />
+          </div>
+          <div className={classes.control}>
+            <label htmlFor="imagen">Imagen</label>
+            <input
+              type="file"
+              className="form-control"
+              id="image"
+              required
+              onChange={onSelectedFileChanged}
+            />
+          </div>
+          <div className={classes.control}>
+            {httpImage.loading && <LoadingSpinner />}
+            {!httpImage.loading && !httpImage.error && httpImage.isShow && (
+              <div className={classes.holder}>
+                <img src={httpImage.imgExcersice} alt="img" />
+              </div>
+            )}
+          </div>
+          <div className={classes.control}>
+            <div className={classes.actions}>
+              <button type="submit" className={classes.toggle}>
+                Guardar
+              </button>
+            </div>
+          </div>
+        </form>
+      </section>
+      {(httpError.error || httpType.error) && (
+        <ErrorMessage
+          showModal={httpError.error || httpType.error}
+          modalHandler={onModalErrorHandler}
+          message={httpError.message || httpType.message}
+        />
+      )}
+    </Fragment>
   );
 };
 

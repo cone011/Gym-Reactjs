@@ -10,6 +10,22 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import { useHistory } from "react-router-dom";
 import DietDetailPage from "../../../pages/Diet/DietDetailPage";
+import LoadingForm from "../../UI/LoadingForm/LoadingForm";
+
+const loadingReducer = (curLoading, action) => {
+  switch (action) {
+    case "BEGIN":
+      return { isLoading: true, error: false, message: null };
+    case "ERROR":
+      return { isLoading: false, error: true, message: action.message };
+    case "CLOSED":
+      return { ...curLoading, error: false };
+    case "END":
+      return { ...curLoading, isLoading: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const DietList = (props) => {
   const history = useHistory();

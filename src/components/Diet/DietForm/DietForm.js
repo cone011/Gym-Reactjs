@@ -14,6 +14,7 @@ import { SelectBox } from "devextreme-react/select-box";
 import DietaDetailList from "../DietDetailList/DietDetailList";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 import { SearchList } from "../../../util/FindItem";
+import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
 
 const dietaReducer = (curDieta, action) => {
   switch (action.type) {
@@ -112,6 +113,10 @@ const DietaForm = (props) => {
 
   const modalShowHandler = () => {
     dispatchSearch({ type: "CLOSED" });
+  };
+
+  const modalShowErrorHandler = () => {
+    dispatchDieta({ type: "CLOSED" });
   };
 
   const dietFormHandler = (event) => {
@@ -250,6 +255,13 @@ const DietaForm = (props) => {
         </form>
       </section>
       {httpDieta.isShowing && <LoadingSpinner />}
+      {httpDieta.error && (
+        <ErrorMessage
+          showModal={httpDieta.error}
+          modalHandler={modalShowErrorHandler}
+          message={httpDieta.message}
+        />
+      )}
       {httpSearch.isShowingSearch && (
         <SearchAlumno
           showModal={httpSearch.isShowingSearch}
