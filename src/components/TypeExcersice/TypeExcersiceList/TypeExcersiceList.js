@@ -123,7 +123,7 @@ const TypeExcersiceList = (props) => {
         message: "No se pudo eliminar este registro",
       });
     }
-  }, [listType]);
+  }, [listType, httpDelete]);
 
   return (
     <Fragment>

@@ -1,4 +1,11 @@
-import { Fragment, useReducer } from "react";
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import classes from "./DietList.module.css";
 import Card from "../../UI/Card/Card";
 import DataGrid, {
@@ -13,6 +20,8 @@ import { useHistory } from "react-router-dom";
 import DietDetailPage from "../../../pages/Diet/DietDetailPage";
 import LoadingForm from "../../UI/LoadingForm/LoadingForm";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import DeleteMessage from "../../UI/DeleteMessage/DeleteMessage";
+import { DeleteDieta } from "../../../lib/DietaApi";
 
 const deleteReducer = (curDelete, action) => {
   switch (action.type) {
@@ -26,7 +35,6 @@ const deleteReducer = (curDelete, action) => {
       return { ...curDelete, isShowing: false };
     case "END":
       return { ...curDelete, isShowing: false };
-
     default:
       throw new Error("No se pudo realizar la accion");
   }
@@ -48,6 +56,9 @@ const loadingReducer = (curLoading, action) => {
 };
 
 const DietList = (props) => {
+  const { dietList } = props;
+  const [listDiet, SetListDiet] = useState([]);
+  const dataRef = useRef();
   const history = useHistory();
   const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
     isLoading: false,
@@ -59,6 +70,14 @@ const DietList = (props) => {
     message: null,
     IdEliminar: null,
   });
+
+  const assigmentValues = useCallback(() => {
+    SetListDiet(dietList);
+  }, [dietList]);
+
+  useEffect(() => {
+    assigmentValues();
+  }, [assigmentValues]);
 
   const editDietButtonHandler = (eventValue) => {
     history.push({
@@ -100,6 +119,52 @@ const DietList = (props) => {
     });
   };
 
+  const showDeleteMessageHandler = (eventeValue) => {
+    dispatchDelete({
+      type: "BEGIN",
+      message: "Desea eliminar este registro?",
+      IdEliminar: eventeValue.row.data.IdDieta,
+    });
+  };
+
+  const onModalErrorHandler = () => {
+    if (httpDelete.error) {
+      dispatchDelete({ type: "CLOSED" });
+    }
+    if (httpLoading.error) {
+      dispatchLoading({ type: "CLOSED" });
+    }
+  };
+
+  const onModalDeleteHandler = () => {
+    if (httpDelete.isShowing) {
+      dispatchDelete({ type: "CLOSED" });
+    }
+  };
+
+  const onDeleteHanlder = useCallback(async () => {
+    try {
+      dispatchDelete({ type: "END" });
+      dispatchLoading({ type: "BEGIN", message: "ELIMINANDO...." });
+      const deleteItem = await DeleteDieta(httpDelete.IdEliminar);
+      if (deleteItem.message === "OK") {
+        const newList = listDiet.filter(
+          (item) => item.IdDieta !== httpDelete.IdEliminar
+        );
+        SetListDiet(newList);
+        dataRef.current.instance.refresh();
+        dispatchLoading({ type: "END" });
+      } else {
+        dispatchLoading({
+          type: "ERROR",
+          message: "No se pudo eliminar este registro",
+        });
+      }
+    } catch (err) {
+      dispatchLoading({ type: "ERROR", message: err.message });
+    }
+  }, [httpDelete]);
+
   return (
     <Fragment>
       <div>
@@ -110,10 +175,11 @@ const DietList = (props) => {
             </div>
           )}
           <DataGrid
-            dataSource={props.dietList}
+            dataSource={listDiet}
             allowColumnReordering={true}
             rowAlternationEnabled={true}
             showBorders={true}
+            ref={dataRef}
           >
             <Selection mode="single" />
             <FilterRow visible={true} applyFilter={true} />
@@ -132,11 +198,33 @@ const DietList = (props) => {
                 >
                   Editar
                 </Button>
+                <Button
+                  name="eliminar"
+                  cssClass="btn"
+                  onClick={showDeleteMessageHandler}
+                >
+                  Eliminar
+                </Button>
               </Column>
             )}
           </DataGrid>
         </Card>
       </div>
+      {(httpLoading.error || httpDelete.isShowing) && (
+        <ErrorMessage
+          showModal={httpLoading.error || httpDelete.isShowing}
+          modalHandler={onModalErrorHandler}
+          message={httpLoading.message || httpDelete.message}
+        />
+      )}
+      {httpDelete.isShowing && (
+        <DeleteMessage
+          showModal={httpDelete.isShowing}
+          message={httpDelete.message}
+          modalHandler={onModalDeleteHandler}
+          onEliminar={onDeleteHanlder}
+        />
+      )}
       {httpLoading.isLoading && (
         <LoadingForm
           showModal={httpLoading.isLoading}

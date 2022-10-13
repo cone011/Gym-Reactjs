@@ -56,7 +56,7 @@ const TypeExcersiceForm = (props) => {
 
     dispatchError({ type: "END" });
 
-    const sendData = {
+    let sendData = {
       Codigo: codeInputForm.current.value,
       Descripcion: descriptionInputForm.current.value,
       esNuevo: esNuevo,

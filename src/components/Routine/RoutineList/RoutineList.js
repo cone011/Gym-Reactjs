@@ -9,9 +9,67 @@ import DataGrid, {
   MasterDetail,
   Button,
 } from "devextreme-react/data-grid";
+import { useState } from "react";
+import { useReducer } from "react";
+import { useCallback } from "react";
+import { useRef } from "react";
+import { useEffect } from "react";
+
+const loadingReducer = (curLoading, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isLoading: true, error: false, message: action.message };
+    case "ERROR":
+      return { isLoading: false, error: true, message: action.message };
+    case "CLOSED":
+      return { ...curLoading, error: false };
+    case "END":
+      return { ...curLoading, isLoading: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const deleteReducer = (curDelete, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return {
+        isShowing: true,
+        message: action.message,
+        IdEliminar: action.IdEliminar,
+      };
+    case "CLOSED":
+      return { ...curDelete, isShowing: false };
+    case "END":
+      return { ...curDelete, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const RoutineList = (props) => {
+  const { routineList } = props;
+  const [ListRoutine, SetListRoutine] = useState([]);
   const history = useHistory();
+  const dataRef = useRef();
+  const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
+    isLoading: false,
+    error: false,
+    message: null,
+  });
+  const [httpDelete, dispatchDelete] = useReducer(deleteReducer, {
+    isShowing: false,
+    message: null,
+    IdEliminar: null,
+  });
+
+  const assigmentValues = useCallback(() => {
+    SetListRoutine(routineList);
+  }, [routineList]);
+
+  useEffect(() => {
+    assigmentValues();
+  }, [assigmentValues]);
 
   const editButtonHandler = (eventValue) => {
     history.push({
@@ -52,10 +110,11 @@ const RoutineList = (props) => {
           </div>
         )}
         <DataGrid
-          dataSource={props.routineList}
+          dataSource={ListRoutine}
           allowColumnReordering={true}
           rowAlternationEnabled={true}
           showBorders={true}
+          ref={dataRef}
         >
           <Selection mode="single" />
           <FilterRow visible={true} applyFilter={true} />
