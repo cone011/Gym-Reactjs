@@ -24,7 +24,11 @@ import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
 const deleteReducer = (curDelete, action) => {
   switch (action.type) {
     case "BEGIN":
-      return { isShowing: true, message: null, IdEliminar: null };
+      return {
+        isShowing: true,
+        message: action.message,
+        IdEliminar: action.IdEliminar,
+      };
     case "CLOSED":
       return { ...curDelete, isShowing: false };
     case "END":
@@ -110,7 +114,7 @@ const TypeExcersiceList = (props) => {
     dispatchDelete({ type: "END" });
     dispatchLoading({ type: "BEGIN", message: "ELIMINANDO...." });
     const deleteItem = await DeleteTypeExcersice(httpDelete.IdEliminar);
-    if (deleteItem.mensaje === "OK") {
+    if (deleteItem.message === "OK") {
       const newList = listType.filter(
         (item) => item.IdTipoEjercicio !== httpDelete.IdEliminar
       );

@@ -163,7 +163,7 @@ const DietList = (props) => {
     } catch (err) {
       dispatchLoading({ type: "ERROR", message: err.message });
     }
-  }, [httpDelete]);
+  }, [httpDelete, listDiet]);
 
   return (
     <Fragment>

@@ -62,7 +62,7 @@ const imageReducer = (curImageState, action) => {
 };
 
 const ExcersiceForm = (props) => {
-  const { excersiceObject, esNuevo } = props;
+  const { excersiceObject, esNuevo, listType } = props;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
   const IdTipoEjercicioInputForm = useRef();
@@ -99,7 +99,7 @@ const ExcersiceForm = (props) => {
   const onSelectedValueChanged = (valueChanged) => {
     dispatchType({ type: "BEGIN" });
     IdTipoEjercicioInputForm.current.value = valueChanged.value;
-    const typeObject = props.listType.find(
+    const typeObject = listType.find(
       (item) => item.IdTipoEjercicio === valueChanged.value
     );
     if (!typeObject) {
@@ -195,7 +195,7 @@ const ExcersiceForm = (props) => {
           <div className={classes.control}>
             <label htmlFor="type">Tipo Ejercicio</label>
             <SelectBox
-              dataSource={props.listType}
+              dataSource={listType}
               placeholder="Seleccione un tipo de ejercicio"
               valueExpr="IdTipoEjercicio"
               displayExpr="Nombre"

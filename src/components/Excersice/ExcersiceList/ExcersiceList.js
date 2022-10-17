@@ -112,11 +112,21 @@ const ExcersiceList = (props) => {
     }
   };
 
+  const showDeleteExcersice = (eventValue) => {
+    dispatchDelete({
+      type: "BEGIN",
+      message: "Desea eliminar este registro?",
+      IdEliminar: eventValue.row.data.IdEjercicio,
+    });
+  };
+
   const onDeleteHanlder = useCallback(async () => {
     try {
       dispatchDelete({ type: "END" });
       dispatchLoading({ type: "BEGIN", message: "ELIMINANDO...." });
+      console.log(httpDelete.IdEliminar);
       const deleteItem = await deleteExcersice(httpDelete.IdEliminar);
+      console.log(deleteItem);
       if (deleteItem.message === "OK") {
         const newList = ListExcersice.filter(
           (item) => item.IdEjercicio !== httpDelete.IdEliminar
@@ -178,6 +188,13 @@ const ExcersiceList = (props) => {
             <Column type="buttons">
               <Button name="editar" cssClass="btn" onClick={editButtonHandler}>
                 Editar
+              </Button>
+              <Button
+                name="eliminar"
+                cssClass="btn"
+                onClick={showDeleteExcersice}
+              >
+                Eliminar
               </Button>
             </Column>
           </DataGrid>

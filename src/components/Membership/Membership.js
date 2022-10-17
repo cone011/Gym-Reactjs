@@ -5,7 +5,7 @@ import classes from "./Membership.module.css";
 const Membership = () => {
   return (
     <div className={classes.membershipContainer}>
-      <h2>Select your membership plan</h2>
+      <h1 className={classes.sectionTitle}>Select your membership plan</h1>
       <ul className={classes.membershipBoxes}>
         {InfoMembership.map((data) => (
           <li key={data.id}>

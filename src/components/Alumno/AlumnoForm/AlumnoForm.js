@@ -1,15 +1,15 @@
 import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
 import classes from "./AlumnoForm.module.css";
-import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
+import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
 
-const alumnoReducer = (curAlumno, action) => {
+const errorReducer = (curError, action) => {
   switch (action.type) {
     case "BEGIN":
-      return { isShowing: true, error: false, message: null };
-    case "ERROR":
-      return { isShowing: false, error: true, message: action.message };
+      return { error: true, message: action.message };
+    case "CLOSED":
+      return { ...curError, error: false };
     case "END":
-      return { ...curAlumno, isShowing: false };
+      return { ...curError, error: false };
     default:
       throw new Error("No se pudo realizar la accion");
   }
@@ -24,10 +24,9 @@ const AlumnoForm = (props) => {
   const direccionInputRef = useRef();
   const telefonoInputRef = useRef();
   const emailInputRef = useRef();
-  const [httpAlumno, dispatchAlumno] = useReducer(alumnoReducer, {
-    isShowing: false,
-    error: false,
-    message: null,
+  const [httpError, dispatchError] = useReducer(errorReducer, {
+    error: true,
+    message: action.message,
   });
 
   const assigmentValues = useCallback(() => {
@@ -53,39 +52,37 @@ const AlumnoForm = (props) => {
   }, [assigmentValues]);
 
   const modalHandler = () => {
-    dispatchAlumno({ type: "CLOSED" });
+    dispatchError({ type: "CLOSED" });
   };
 
   const alumnoSubmitHandler = (event) => {
     event.preventDefault();
 
-    dispatchAlumno({ type: "BEGIN" });
-
     if (nameInputRef.current.value.trim().length === 0) {
-      dispatchAlumno({ type: "ERROR", message: "Favor cargue su nombre" });
+      dispatchError({ type: "BEGIN", message: "Favor cargue su nombre" });
       return;
     }
 
     if (cedulaInputRef.current.value.trim().length === 0) {
-      dispatchAlumno({ type: "ERROR", message: "Favor cargue su cedula" });
+      dispatchError({ type: "BEGIN", message: "Favor cargue su cedula" });
       return;
     }
 
     if (edadInputRef.current.value === 0) {
-      dispatchAlumno({ type: "ERROR", message: "Favor de cargar su edad" });
+      dispatchError({ type: "BEGIN", message: "Favor de cargar su edad" });
       return;
     }
 
     if (telefonoInputRef.current.value.trim().length === 0) {
-      dispatchAlumno({
-        type: "ERROR",
+      dispatchError({
+        type: "BEGIN",
         message: "Favor cargar su numero de telefono",
       });
       return;
     }
 
     if (direccionInputRef.current.value.trim().length === 0) {
-      dispatchAlumno({ type: "ERROR", message: "Favor cargar la direccion" });
+      dispatchError({ type: "BEGIN", message: "Favor cargar la direccion" });
       return;
     }
 
@@ -107,8 +104,6 @@ const AlumnoForm = (props) => {
         IdAlumno: alumnoObject.IdAlumno,
       };
     }
-
-    dispatchAlumno({ type: "END" });
 
     props.onSaveAlumnoHandler({
       ...sendDataObject,
@@ -163,7 +158,13 @@ const AlumnoForm = (props) => {
           </div>
         </form>
       </section>
-      {httpAlumno.isShowing && <LoadingSpinner />}
+      {httpError.error && (
+        <ErrorMessage
+          showModal={httpError.error}
+          message={httpError.message}
+          modalHandler={modalHandler}
+        />
+      )}
     </Fragment>
   );
 };
