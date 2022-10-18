@@ -1,3 +1,11 @@
+import {
+  Fragment,
+  useCallback,
+  useEffect,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 import classes from "./AlumnoList.module.css";
 import DataGrid, {
   Column,
@@ -8,9 +16,81 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import Card from "../../UI/Card/Card";
 import { useHistory } from "react-router-dom";
+import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import LoadingForm from "../../UI/LoadingForm/LoadingForm";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
+import DeleteMessage from "../../UI/DeleteMessage/DeleteMessage";
+
+const deleteReducer = (curDelete, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return {
+        isShowing: true,
+        message: action.message,
+        IdEliminar: action.IdEliminar,
+      };
+    case "CLOSED":
+      return { ...curDelete, isShowing: false };
+    case "END":
+      return { ...curDelete, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const loadingReducer = (curLoading, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, error: false, message: action.type };
+    case "ERROR":
+      return { isShowing: false, error: true, message: action.type };
+    case "CLOSED":
+      return { ...curLoading, error: false };
+    case "END":
+      return { ...curLoading, isSearching: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "CLOSED":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const AlumnoList = (props) => {
+  const { isSearching, alumnoData } = props;
+  const [ListAlumno, SetListAlumno] = useState([]);
+  const dataRef = useRef();
   const history = useHistory();
+  const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
+    isShowing: false,
+    error: false,
+    message: null,
+  });
+  const [httpDelete, dispatchDelete] = useReducer(deleteReducer, {
+    isShowing: false,
+    message: null,
+    IdEliminar: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
+    message: null,
+  });
+
+  const assigmentValues = useCallback(() => {
+    SetListAlumno(alumnoData);
+  }, [alumnoData]);
+
+  useEffect(() => {
+    assigmentValues();
+  }, [assigmentValues]);
 
   const newButtonHandler = () => {
     history.push({
@@ -43,53 +123,124 @@ const AlumnoList = (props) => {
     });
   };
 
+  const showDeleteAlumno = (eventValue) => {
+    dispatchDelete({
+      type: "BEGIN",
+      message: "Desea eliminar a este alumno?",
+      IdEliminar: eventValue.row.data.IdAlumno,
+    });
+  };
+
+  const onModalDeleteHandler = () => {
+    if (httpDelete.isShowing) {
+      dispatchDelete({ type: "CLOSED" });
+    }
+  };
+
+  const onModalErrorHandler = () => {
+    if (httpLoading.error) {
+      dispatchLoading({ type: "CLOSED" });
+    }
+  };
+
+  const onModalConfirmHandler = () => {
+    if (httpConfirm.isShowing) {
+      dispatchConfirm({ type: "CLOSED" });
+    }
+  };
+
+  const onDeleteAlumnoHandler = useCallback(async () => {}, []);
+
   return (
-    <div>
-      <Card className={classes.tableCenteredAlumno}>
-        {!props.isSearching && (
-          <div className={classes.newAlumno} onClick={newButtonHandler}>
-            <button>Nueva Alumno</button>
-          </div>
-        )}
-        <DataGrid
-          dataSource={props.alumnoData}
-          allowColumnReordering={true}
-          rowAlternationEnabled={true}
-          showBorders={true}
-        >
-          <Selection mode="single" />
-          <FilterRow visible={true} applyFilter={true} />
-          <HeaderFilter visible={true} />
-          <Column
-            dataField="IdAlumno"
-            caption="#"
-            dataType="number"
-            visible={false}
-          />
-          <Column
-            dataField="IdUsuario"
-            caption="Id User."
-            dataType="number"
-            visible={false}
-          />
-          <Column dataField="Cedula" caption="CI." dataType="string" />
-          <Column dataField="Nombre" caption="Nombre" dataType="string" />
-          {!props.isSearching && (
-            <Column dataField="Telefono" caption="Telefono" dataType="string" />
+    <Fragment>
+      <div>
+        <Card className={classes.tableCenteredAlumno}>
+          {!isSearching && (
+            <div className={classes.newAlumno} onClick={newButtonHandler}>
+              <button>Nueva Alumno</button>
+            </div>
           )}
-          {!props.isSearching && (
-            <Column dataField="Email" caption="Email" dataType="string" />
-          )}
-          {!props.isSearching && (
-            <Column type="buttons">
-              <Button name="editar" cssClass="btn" onClick={editValueHandler}>
-                Editar
-              </Button>
-            </Column>
-          )}
-        </DataGrid>
-      </Card>
-    </div>
+          <DataGrid
+            dataSource={ListAlumno}
+            allowColumnReordering={true}
+            rowAlternationEnabled={true}
+            showBorders={true}
+            ref={dataRef}
+          >
+            <Selection mode="single" />
+            <FilterRow visible={true} applyFilter={true} />
+            <HeaderFilter visible={true} />
+            <Column
+              dataField="IdAlumno"
+              caption="#"
+              dataType="number"
+              visible={false}
+            />
+            <Column
+              dataField="IdUsuario"
+              caption="Id User."
+              dataType="number"
+              visible={false}
+            />
+            <Column dataField="Cedula" caption="CI." dataType="string" />
+            <Column dataField="Nombre" caption="Nombre" dataType="string" />
+            {!isSearching && (
+              <Column
+                dataField="Telefono"
+                caption="Telefono"
+                dataType="string"
+              />
+            )}
+            {!isSearching && (
+              <Column dataField="Email" caption="Email" dataType="string" />
+            )}
+            {!isSearching && (
+              <Column type="buttons">
+                <Button name="editar" cssClass="btn" onClick={editValueHandler}>
+                  Editar
+                </Button>
+                <Button
+                  name="eliminar"
+                  cssClass="btn"
+                  onClick={showDeleteAlumno}
+                >
+                  Eliminar
+                </Button>
+              </Column>
+            )}
+          </DataGrid>
+        </Card>
+      </div>
+      {httpLoading.error && (
+        <ErrorMessage
+          showModal={httpLoading.error}
+          message={httpLoading.message}
+          modalHandler={onModalErrorHandler}
+        />
+      )}
+      {httpLoading.isShowing && (
+        <LoadingForm
+          showModal={httpLoading.isShowing}
+          message={httpLoading.message}
+        />
+      )}
+      {httpDelete.isShowing && (
+        <DeleteMessage
+          showModal={httpDelete.isShowing}
+          message={httpDelete.message}
+          modalHandler={onModalDeleteHandler}
+          onEliminar={onDeleteAlumnoHandler}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          message={httpConfirm.message}
+          modalHandler={onModalConfirmHandler}
+          onClose={onModalConfirmHandler}
+        />
+      )}
+    </Fragment>
   );
 };
 

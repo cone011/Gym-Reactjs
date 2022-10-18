@@ -73,5 +73,7 @@ export async function deleteExcersice(IdEjercicio) {
     throw new Error(data.message || "Could not delete the excersice");
   }
 
+  console.log(data);
+
   return { ...data };
 }

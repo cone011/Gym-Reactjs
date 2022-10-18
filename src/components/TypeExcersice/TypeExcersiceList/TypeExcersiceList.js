@@ -20,6 +20,18 @@ import DataGrid, {
   Button,
 } from "devextreme-react/data-grid";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
+
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "CLOSED":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const deleteReducer = (curDelete, action) => {
   switch (action.type) {
@@ -65,6 +77,10 @@ const TypeExcersiceList = (props) => {
   const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
     isShowing: false,
     error: false,
+    message: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
     message: null,
   });
   const dataRef = useRef();
@@ -113,21 +129,30 @@ const TypeExcersiceList = (props) => {
   const onDeleteHanlder = useCallback(async () => {
     dispatchDelete({ type: "END" });
     dispatchLoading({ type: "BEGIN", message: "ELIMINANDO...." });
-    const deleteItem = await DeleteTypeExcersice(httpDelete.IdEliminar);
-    if (deleteItem.message === "OK") {
-      const newList = listType.filter(
-        (item) => item.IdTipoEjercicio !== httpDelete.IdEliminar
-      );
-      SetListType(newList);
-      dataRef.current.instance.refresh();
-      dispatchLoading({ type: "END" });
-    } else {
-      dispatchLoading({
-        type: "ERROR",
-        message: "No se pudo eliminar este registro",
-      });
+    try {
+      const deleteItem = await DeleteTypeExcersice(httpDelete.IdEliminar);
+      if (deleteItem.message === "OK") {
+        const newList = listType.filter(
+          (item) => item.IdTipoEjercicio !== httpDelete.IdEliminar
+        );
+        SetListType(newList);
+        dataRef.current.instance.refresh();
+        dispatchLoading({ type: "END" });
+        dispatchConfirm({ type: "BEGIN", message: "Se elimino correctamente" });
+      } else {
+        dispatchLoading({
+          type: "ERROR",
+          message: "No se pudo eliminar este registro",
+        });
+      }
+    } catch (err) {
+      dispatchLoading({ type: "ERROR", message: err.message });
     }
   }, [listType, httpDelete]);
+
+  const ConfirmModalHandler = () => {
+    dispatchConfirm({ type: "CLOSED" });
+  };
 
   return (
     <Fragment>
@@ -181,9 +206,9 @@ const TypeExcersiceList = (props) => {
       </div>
       {(httpDelete.error || httpLoading.error) && (
         <ErrorMessage
-          showModal={httpDelete.error}
+          showModal={httpDelete.error || httpLoading.error}
           modalHandler={onModalErrorHandler}
-          message={httpDelete.message}
+          message={httpDelete.message || httpLoading.message}
         />
       )}
       {httpDelete.isShowing && (
@@ -198,6 +223,14 @@ const TypeExcersiceList = (props) => {
         <LoadingForm
           showModal={httpLoading.isShowing}
           message={httpLoading.message}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          modalHandler={ConfirmModalHandler}
+          message={httpConfirm.message}
+          onClose={ConfirmModalHandler}
         />
       )}
     </Fragment>

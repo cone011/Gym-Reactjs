@@ -98,9 +98,6 @@ const ExcersiceList = (props) => {
   };
 
   const onModalErrorHandler = () => {
-    if (httpDelete.error) {
-      dispatchDelete({ type: "CLOSED" });
-    }
     if (httpLoading.error) {
       dispatchLoading({ type: "CLOSED" });
     }
@@ -206,10 +203,10 @@ const ExcersiceList = (props) => {
           message={httpLoading.message}
         />
       )}
-      {(httpLoading.error || httpDelete.isShowing) && (
+      {httpLoading.error && (
         <ErrorMessage
-          showModal={httpLoading.error || httpDelete.isShowing}
-          message={httpLoading.message || httpDelete.message}
+          showModal={httpLoading.error}
+          message={httpLoading.message}
           modalHandler={onModalErrorHandler}
         />
       )}

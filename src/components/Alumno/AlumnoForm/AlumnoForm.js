@@ -26,7 +26,7 @@ const AlumnoForm = (props) => {
   const emailInputRef = useRef();
   const [httpError, dispatchError] = useReducer(errorReducer, {
     error: true,
-    message: action.message,
+    message: null,
   });
 
   const assigmentValues = useCallback(() => {
