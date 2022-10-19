@@ -58,7 +58,7 @@ const TypeExcersiceForm = (props) => {
 
     let sendData = {
       Codigo: codeInputForm.current.value,
-      Descripcion: descriptionInputForm.current.value,
+      Nombre: descriptionInputForm.current.value,
       esNuevo: esNuevo,
     };
 

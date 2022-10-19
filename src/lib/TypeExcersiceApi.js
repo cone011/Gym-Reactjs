@@ -57,13 +57,12 @@ export async function SaveTypeExcersice(typeExcersiceData) {
 
   const data = await response.json();
 
-  if (!response.ok) {
-    throw new Error("No se pudo realizar la operacion correctamente");
-  }
-
   const typeExcersiceObject = {
     ...data,
   };
+
+  console.log(typeExcersiceObject);
+
   return typeExcersiceObject;
 }
 
