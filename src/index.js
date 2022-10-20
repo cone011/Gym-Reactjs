@@ -6,11 +6,16 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { AuthContextProvider } from "./store/auth-context";
+import ShowMessageOut from "./components/UI/ShowMessageOut/ShowMessageOut";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <AuthContextProvider>
-    <BrowserRouter>
+    <BrowserRouter
+      getUserConfirmation={(message, callback) => {
+        ShowMessageOut(message, callback);
+      }}
+    >
       <App />
     </BrowserRouter>
   </AuthContextProvider>
