@@ -115,17 +115,16 @@ const ExcersiceList = (props) => {
   };
 
   const onDeleteHanlder = useCallback(async () => {
+    dispatchDelete({ type: "END" });
+    dispatchLoading({ type: "BEGIN", message: "ELIMINANDO...." });
     try {
-      dispatchDelete({ type: "END" });
-      dispatchLoading({ type: "BEGIN", message: "ELIMINANDO...." });
-      console.log(httpDelete.IdEliminar);
       const deleteItem = await deleteExcersice(httpDelete.IdEliminar);
-      console.log(deleteItem);
       if (deleteItem.message === "OK") {
         const newList = ListExcersice.filter(
           (item) => item.IdEjercicio !== httpDelete.IdEliminar
         );
         SetListExcersice(newList);
+        dataRef.current.instance.refresh();
         dispatchLoading({ type: "END" });
       } else {
         dispatchLoading({

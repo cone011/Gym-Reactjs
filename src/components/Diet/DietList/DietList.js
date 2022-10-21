@@ -17,11 +17,12 @@ import DataGrid, {
   Button,
 } from "devextreme-react/data-grid";
 import { useHistory } from "react-router-dom";
+import { DeleteDieta } from "../../../lib/DietaApi";
 import DietDetailPage from "../../../pages/Diet/DietDetailPage";
 import LoadingForm from "../../UI/LoadingForm/LoadingForm";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
 import DeleteMessage from "../../UI/DeleteMessage/DeleteMessage";
-import { DeleteDieta } from "../../../lib/DietaApi";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
 
 const deleteReducer = (curDelete, action) => {
   switch (action.type) {
@@ -55,8 +56,19 @@ const loadingReducer = (curLoading, action) => {
   }
 };
 
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "CLOSED":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
 const DietList = (props) => {
-  const { dietList } = props;
+  const { dietList, isEditable } = props;
   const [listDiet, SetListDiet] = useState([]);
   const dataRef = useRef();
   const history = useHistory();
@@ -69,6 +81,10 @@ const DietList = (props) => {
     isShowing: false,
     message: null,
     IdEliminar: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
+    message: null,
   });
 
   const assigmentValues = useCallback(() => {
@@ -165,11 +181,15 @@ const DietList = (props) => {
     }
   }, [httpDelete, listDiet]);
 
+  const ConfirmModalHandler = () => {
+    dispatchConfirm({ type: "CLOSED" });
+  };
+
   return (
     <Fragment>
       <div>
         <Card className={classes.tableCenteredDiet}>
-          {props.isEditable && (
+          {isEditable && (
             <div className={classes.newDiet} onClick={newButtonHandler}>
               <button>Nueva Dieta</button>
             </div>
@@ -189,7 +209,7 @@ const DietList = (props) => {
             <Column dataField="Alumno" caption="Alumno" dataType="string" />
             <Column dataField="Trainner" caption="Trainner" dataType="string" />
             <Column dataField="FechaCarga" caption="Fecha" dataType="date" />
-            {props.isEditable && (
+            {isEditable && (
               <Column type="buttons">
                 <Button
                   name="editar"
@@ -229,6 +249,14 @@ const DietList = (props) => {
         <LoadingForm
           showModal={httpLoading.isLoading}
           message={httpLoading.message}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          modalHandler={ConfirmModalHandler}
+          message={httpConfirm.message}
+          onClose={ConfirmModalHandler}
         />
       )}
     </Fragment>
