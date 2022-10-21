@@ -1,6 +1,5 @@
 import { useContext } from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import classes from "./Navbar.module.css";
 import AuthContext from "../../../store/auth-context";
 
 const NavbarUI = (props) => {
@@ -40,7 +39,9 @@ const NavbarUI = (props) => {
                 Rango de Fecha Campañas
               </NavDropdown.Item>
             </NavDropdown>
-            <Nav.Link eventKey="1">Logout</Nav.Link>
+            <button className="btn" onClick={authCtx.logout}>
+              LogOut
+            </button>
           </Nav>
         </Navbar.Collapse>
       </Container>

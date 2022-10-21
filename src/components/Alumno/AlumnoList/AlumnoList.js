@@ -94,7 +94,7 @@ const AlumnoList = (props) => {
 
   const newButtonHandler = () => {
     history.push({
-      pathname: "/new-alumno",
+      pathname: "/form-alumno",
       state: {
         esNuevo: true,
         alumnoObject: {
@@ -113,7 +113,7 @@ const AlumnoList = (props) => {
 
   const editValueHandler = (eventValue) => {
     history.push({
-      pathname: "/edit-alumno",
+      pathname: "/form-alumno",
       state: {
         esNuevo: false,
         alumnoObject: {

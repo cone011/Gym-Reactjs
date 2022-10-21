@@ -25,7 +25,7 @@ const AlumnoForm = (props) => {
   const telefonoInputRef = useRef();
   const emailInputRef = useRef();
   const [httpError, dispatchError] = useReducer(errorReducer, {
-    error: true,
+    error: false,
     message: null,
   });
 
@@ -45,7 +45,8 @@ const AlumnoForm = (props) => {
         .toISOString()
         .substring(0, 10);
     }
-  }, [esNuevo, alumnoObject]);
+    console.log(IdUsuario);
+  }, [esNuevo, alumnoObject, IdUsuario]);
 
   useEffect(() => {
     assigmentValues();

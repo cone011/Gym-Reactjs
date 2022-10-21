@@ -85,7 +85,6 @@ const Footer = () => {
             >
               <i className="fab fa-twitter" />
             </Link>
-            <i class="fa fa-linkedin" aria-hidden="true"></i>
           </div>
         </div>
       </section>

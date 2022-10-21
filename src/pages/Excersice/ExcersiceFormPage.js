@@ -32,7 +32,6 @@ const ExcersiceFormPage = () => {
     <ExcersiceForm
       esNuevo={location.state.esNuevo}
       excersiceObject={location.state.excersiceObject}
-      listType={location.state.listType}
       onSaveExcersice={saveExcersiceHandler}
     />
   );

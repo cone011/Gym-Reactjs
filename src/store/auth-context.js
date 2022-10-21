@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 
 const AuthContext = React.createContext({
   token: "",
-  isLoggedIn: false,
+  loggedIn: false,
   userData: null,
   login: (token) => {},
   logout: () => {},
@@ -10,6 +10,7 @@ const AuthContext = React.createContext({
 
 const retrieveStoredToken = () => {
   const storedToken = localStorage.getItem("token");
+  const storedLoggedIn = localStorage.getItem("loggedIn");
   const storedUserData = {
     IdUsuario: localStorage.getItem("IdUsuario"),
     EsTrainner: localStorage.getItem("EsTrainner"),
@@ -17,28 +18,39 @@ const retrieveStoredToken = () => {
   return {
     token: storedToken,
     userData: storedUserData,
+    loggedIn: storedLoggedIn === "true" ? true : false,
   };
 };
 
 export const AuthContextProvider = (props) => {
   const tokenData = retrieveStoredToken();
 
-  const [token, setToken] = useState(tokenData);
-  const [userData, setUserData] = useState(null);
+  let initialToken, initialLogged, initialUserData;
+  if (tokenData) {
+    initialToken = tokenData.token;
+    initialLogged = tokenData.loggedIn;
+    initialUserData = tokenData.userData;
+  }
 
-  const userIsLoggedIn = !!token;
+  const [token, setToken] = useState(initialToken);
+  const [userData, setUserData] = useState(initialUserData);
+  const [loggedIn, SetLoggedIn] = useState(initialLogged);
 
   const logoutHandler = useCallback(() => {
     setToken(null);
     localStorage.removeItem("token");
+    localStorage.removeItem("loggedIn");
     localStorage.removeItem("IdUsuario");
     localStorage.removeItem("EsTrainner");
   }, []);
 
-  const loginHandler = (token, userData) => {
+  const loginHandler = (token, userData, loggedIn) => {
+    console.log(loggedIn);
     setToken(token);
     setUserData(userData);
+    SetLoggedIn(loggedIn);
     localStorage.setItem("token", token);
+    localStorage.setItem("loggedIn", loggedIn ? true : false);
     localStorage.setItem("IdUsuario", userData.IdUsuario);
     localStorage.setItem("EsTrainner", userData.EsTrainner);
   };
@@ -51,7 +63,7 @@ export const AuthContextProvider = (props) => {
 
   const contextValue = {
     token: token,
-    isLoggedIn: userIsLoggedIn,
+    loggedIn: loggedIn,
     userData: userData,
     login: loginHandler,
     logout: logoutHandler,

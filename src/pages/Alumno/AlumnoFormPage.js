@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useContext } from "react";
+import AuthContext from "../../store/auth-context";
 import useHttp from "../../hook/use-http";
 import { useLocation, useHistory } from "react-router-dom";
 import { SaveAlumno } from "../../lib/AlumnoApi";
@@ -6,6 +7,7 @@ import AlumnoForm from "../../components/Alumno/AlumnoForm/AlumnoForm";
 import LoadingForm from "../../components/UI/LoadingForm/LoadingForm";
 
 const AlumnoFormPage = () => {
+  const authCtx = useContext(AuthContext);
   const { sendRequest, status } = useHttp(SaveAlumno);
 
   const history = useHistory();
@@ -33,7 +35,7 @@ const AlumnoFormPage = () => {
     <AlumnoForm
       alumnoObject={location.state.alumnoObject}
       esNuevo={location.state.esNuevo}
-      IdUsuario={1} //{location.state.IdUsuario}
+      IdUsuario={authCtx.userData.IdUsuario}
       onSaveAlumnoHandler={saveAlumnoHandler}
     />
   );

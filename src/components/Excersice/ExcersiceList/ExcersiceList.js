@@ -16,7 +16,6 @@ import DataGrid, {
 } from "devextreme-react/data-grid";
 import Card from "../../UI/Card/Card";
 import { useHistory } from "react-router-dom";
-import { GetAllTypeExcersice } from "../../../lib/TypeExcersiceApi";
 import { deleteExcersice } from "../../../lib/ExcersiceApi";
 import LoadingForm from "../../UI/LoadingForm/LoadingForm";
 import DeleteMessage from "../../UI/DeleteMessage/DeleteMessage";
@@ -78,22 +77,20 @@ const ExcersiceList = (props) => {
     assigmentValues();
   }, [assigmentValues]);
 
-  const editButtonHandler = async (eventValue) => {
+  const editButtonHandler = (eventValue) => {
     const auxObject = eventValue.row.data;
     const excersiceObject = auxObject;
-    const listType = await GetAllTypeExcersice();
 
     history.push({
-      pathname: "/edit-excersice",
-      state: { esNuevo: false, excersiceObject, listType },
+      pathname: "/form-excersice",
+      state: { esNuevo: false, excersiceObject },
     });
   };
 
-  const newButtonHandler = async () => {
-    const listType = await GetAllTypeExcersice();
+  const newButtonHandler = () => {
     history.push({
-      pathname: "/new-excersice",
-      state: { esNuevo: true, listType },
+      pathname: "/form-excersice",
+      state: { esNuevo: true },
     });
   };
 

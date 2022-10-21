@@ -57,7 +57,7 @@ const AuthForm = () => {
 
     const response = await GetValidUsuario(usuario, password);
 
-    authCtx.login(response.token, response);
+    authCtx.login(response.token, response, true);
 
     dispatchAuth({ type: "END" });
 

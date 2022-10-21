@@ -66,7 +66,7 @@ const DietList = (props) => {
     message: null,
   });
   const [httpDelete, dispatchDelete] = useReducer(deleteReducer, {
-    isShowing: true,
+    isShowing: false,
     message: null,
     IdEliminar: null,
   });

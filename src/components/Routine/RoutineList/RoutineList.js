@@ -6,7 +6,6 @@ import DataGrid, {
   Selection,
   HeaderFilter,
   FilterRow,
-  MasterDetail,
   Button,
 } from "devextreme-react/data-grid";
 import { useState } from "react";
@@ -73,7 +72,7 @@ const RoutineList = (props) => {
 
   const editButtonHandler = (eventValue) => {
     history.push({
-      pathname: "/edit-routine",
+      pathname: "/form-routine",
       state: {
         esNuevo: false,
         routineObject: {
@@ -85,7 +84,7 @@ const RoutineList = (props) => {
 
   const newButtonHandler = () => {
     history.push({
-      pathname: "/new-routine",
+      pathname: "/form-routine",
       state: {
         esNuevo: true,
         routineObject: {
@@ -119,7 +118,6 @@ const RoutineList = (props) => {
           <Selection mode="single" />
           <FilterRow visible={true} applyFilter={true} />
           <HeaderFilter visible={true} />
-          {/*<MasterDetail enabled={true} component={showDietDetail} />*/}
           <Column dataField="IdRutina" caption="#" dataType="number" />
           <Column dataField="Alumno" caption="Alumno" dataType="string" />
           <Column dataField="Trainner" caption="Trainner" dataType="string" />

@@ -1,8 +1,16 @@
-import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
+import {
+  useRef,
+  useEffect,
+  useCallback,
+  useReducer,
+  Fragment,
+  useState,
+} from "react";
 import { SelectBox } from "devextreme-react/select-box";
 import classes from "./ExcersiceForm.module.css";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import { getAllExcersice } from "../../../lib/ExcersiceApi";
 
 const tipoEjercicioReducer = (curTipoEjercicio, action) => {
   switch (action.type) {
@@ -62,10 +70,11 @@ const imageReducer = (curImageState, action) => {
 };
 
 const ExcersiceForm = (props) => {
-  const { excersiceObject, esNuevo, listType } = props;
+  const { excersiceObject, esNuevo } = props;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
   const IdTipoEjercicioInputForm = useRef();
+  const [ListType, SetListType] = useState([]);
   const [httpImage, dispatchImage] = useReducer(imageReducer, {
     loading: false,
     error: false,
@@ -83,13 +92,15 @@ const ExcersiceForm = (props) => {
     objectType: null,
   });
 
-  const assigmentsValues = useCallback(() => {
+  const assigmentsValues = useCallback(async () => {
     if (!esNuevo) {
       codeInputForm.current.value = excersiceObject.Codigo;
       descriptionInputForm.current.value = excersiceObject.Nombre;
       IdTipoEjercicioInputForm.current.value = excersiceObject.IdTipoEjercicio;
       httpImage.imgExcersice = excersiceObject.ImagenUrl;
     }
+    let listResult = await getAllExcersice();
+    SetListType(listResult);
   }, [esNuevo, excersiceObject, httpImage]);
 
   useEffect(() => {
@@ -99,7 +110,7 @@ const ExcersiceForm = (props) => {
   const onSelectedValueChanged = (valueChanged) => {
     dispatchType({ type: "BEGIN" });
     IdTipoEjercicioInputForm.current.value = valueChanged.value;
-    const typeObject = listType.find(
+    const typeObject = ListType.find(
       (item) => item.IdTipoEjercicio === valueChanged.value
     );
     if (!typeObject) {
@@ -195,12 +206,12 @@ const ExcersiceForm = (props) => {
           <div className={classes.control}>
             <label htmlFor="type">Tipo Ejercicio</label>
             <SelectBox
-              dataSource={listType}
+              dataSource={ListType}
               placeholder="Seleccione un tipo de ejercicio"
               valueExpr="IdTipoEjercicio"
               displayExpr="Nombre"
               searchEnabled={true}
-              defaultValue={esNuevo ? null : excersiceObject.TipoEjercicio}
+              defaultValue={esNuevo ? null : excersiceObject.IdTipoEjercicio}
               onValueChanged={onSelectedValueChanged}
               ref={IdTipoEjercicioInputForm}
             />

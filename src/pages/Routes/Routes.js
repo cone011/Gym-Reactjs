@@ -14,7 +14,10 @@ import Searching from "../../components/Search/Searching/Searching";
 import AlumnoFormPage from "../Alumno/AlumnoFormPage";
 import AllUsers from "../Users/AllUsers";
 import AuthForm from "../../components/Auth/AuthForm";
+import { useContext } from "react";
+import AuthContext from "../../store/auth-context";
 const Routes = () => {
+  const authCtx = useContext(AuthContext);
   return (
     <Switch>
       <Route path="/" exact>
@@ -27,55 +30,49 @@ const Routes = () => {
         <Home />
       </Route>
       <Route path="/type-excersice" exact>
-        <AllTypeExcersice />
+        {authCtx.loggedIn && <AllTypeExcersice />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
-      <Route path="/excersice" exact>
-        <AllExcersice />
+      <Route path="/excersice">
+        {authCtx.loggedIn && <AllExcersice />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
-      <Route path="/new-excersice" exact>
-        <ExcersiceFormPage />
+      <Route path="/form-excersice" exact>
+        {authCtx.loggedIn && <ExcersiceFormPage />}
+        {!authCtx.loggedIn && <Route to="/home" />}
       </Route>
-      <Route path="/edit-excersice" exact>
-        <ExcersiceFormPage />
-      </Route>
-      <Route path="/new-type-excersice" exact>
-        <TypeExcersiceFormPage />
-      </Route>
-      <Route path="/edit-type-excersice" exact>
-        <TypeExcersiceFormPage />
+      <Route path="/form-type-excersice" exact>
+        {authCtx.loggedIn && <TypeExcersiceFormPage />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/alumno" exact>
-        <AllAlumno />
+        {authCtx.loggedIn && <AllAlumno />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
+      </Route>
+      <Route path="/form-alumno" exact>
+        {authCtx.loggedIn && <AlumnoFormPage />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/diet" exact>
         <AllDiet />
       </Route>
-      <Route path="/new-diet" exact>
-        <DietFormPage />
-      </Route>
-      <Route path="/edit-diet" exact>
-        <DietFormPage />
+      <Route path="/form-diet" exact>
+        {authCtx.loggedIn && <DietFormPage />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/routine" exact>
-        <AllRoutine />
+        {authCtx.loggedIn && <AllRoutine />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
-      <Route path="/new-routine" exact>
-        <RoutineFormPage />
-      </Route>
-      <Route path="/edit-routine" exact>
-        <RoutineFormPage />
+      <Route path="/form-routine" exact>
+        {authCtx.loggedIn && <RoutineFormPage />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/search-diet" exact>
         <Searching typeSearching={"DIET"} />
       </Route>
       <Route path="/search-routine" exact>
         <Searching typeSearching={"ROUTINE"} />
-      </Route>
-      <Route path="/new-alumno" exact>
-        <AlumnoFormPage />
-      </Route>
-      <Route path="/edit-alumno" exact>
-        <AlumnoFormPage />
       </Route>
       <Route path="/users" exact>
         <AllUsers />
