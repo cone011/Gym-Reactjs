@@ -1,26 +1,51 @@
 import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
 import classes from "./TypeExcersiceForm.module.css";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import { SaveTypeExcersice } from "../../../lib/TypeExcersiceApi";
+import LoadingForm from "../../UI/LoadingForm/LoadingForm";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
+import { useHistory, useLocation } from "react-router-dom";
 
-const errorReducer = (curError, action) => {
+const loadingReducer = (curLoading, action) => {
   switch (action.type) {
     case "BEGIN":
-      return { error: false, message: null };
+      return { isLoading: true, error: false, message: action.message };
     case "ERROR":
-      return { error: true, message: action.message };
+      return { isLoading: false, error: true, message: action.message };
     case "CLOSED":
-      return { ...curError, error: false };
+      return { ...curLoading, error: true, message: action.message };
+    case "END":
+      return { ...curLoading, isLoading: false };
     default:
       throw new Error("No se pudo realizar la accion");
   }
 };
 
-const TypeExcersiceForm = (props) => {
-  const { esNuevo, typeExcersiceObject } = props;
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "END":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const TypeExcersiceForm = () => {
+  const location = useLocation();
+  const history = useHistory();
+  console.log(location);
+  const { esNuevo, typeExcersiceObject } = location.state;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();
-  const [httpError, dispatchError] = useReducer(errorReducer, {
+  const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
+    isLoading: false,
     error: false,
+    message: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
     message: null,
   });
 
@@ -35,45 +60,67 @@ const TypeExcersiceForm = (props) => {
     assigmentsValues();
   }, [assigmentsValues]);
 
-  const typeExcersiceSubmitHandler = (event) => {
-    event.preventDefault();
+  const typeExcersiceSubmitHandler = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-    dispatchError({ type: "BEGIN" });
+      dispatchLoading({ type: "BEGIN", message: "SAVING....." });
 
-    if (codeInputForm.current.value.trim().length === 0) {
-      dispatchError({
-        type: "ERROR",
-        message: "No se encuentra un codigo asginado al registro",
-      });
-    }
+      try {
+        if (codeInputForm.current.value.trim().length === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "No se encuentra un codigo asginado al registro",
+          });
+        }
 
-    if (descriptionInputForm.current.value.trim().length === 0) {
-      dispatchError({
-        type: "ERROR",
-        message: "No se encuentra una descripcion asginada al registro",
-      });
-    }
+        if (descriptionInputForm.current.value.trim().length === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "No se encuentra una descripcion asginada al registro",
+          });
+        }
 
-    dispatchError({ type: "END" });
+        dispatchLoading({ type: "END" });
 
-    let sendData = {
-      Codigo: codeInputForm.current.value,
-      Nombre: descriptionInputForm.current.value,
-      esNuevo: esNuevo,
-    };
+        let sendData = {
+          Codigo: codeInputForm.current.value,
+          Nombre: descriptionInputForm.current.value,
+          esNuevo: esNuevo,
+        };
 
-    if (!esNuevo) {
-      sendData = {
-        ...sendData,
-        IdTipoEjercicio: typeExcersiceObject.IdTipoEjercicio,
-      };
-    }
+        if (!esNuevo) {
+          sendData = {
+            ...sendData,
+            IdTipoEjercicio: typeExcersiceObject.IdTipoEjercicio,
+          };
+        }
 
-    props.onSaveTypeExcersice({ ...sendData });
-  };
+        const datarReponse = await SaveTypeExcersice(sendData);
+
+        if (datarReponse.message === "OK") {
+          dispatchLoading({ type: "END" });
+          dispatchConfirm({
+            type: "BEGIN",
+            message: "Se guardo con exito el tipo de ejercicio",
+          });
+        }
+      } catch (err) {
+        dispatchLoading({ type: "ERROR", message: err.message });
+      }
+    },
+    [esNuevo, typeExcersiceObject]
+  );
 
   const onModalErrorHandler = () => {
-    dispatchError({ type: "CLOSED" });
+    dispatchLoading({ type: "CLOSED" });
+  };
+
+  const onModalConfirmHandler = () => {
+    if (httpConfirm.isShowing) {
+      dispatchConfirm({ type: "END" });
+      history.push("/type-excersice");
+    }
   };
 
   return (
@@ -105,11 +152,25 @@ const TypeExcersiceForm = (props) => {
           </div>
         </form>
       </section>
-      {httpError.error && (
+      {httpLoading.isLoading && (
+        <LoadingForm
+          showModal={httpLoading.isLoading}
+          message={httpLoading.message}
+        />
+      )}
+      {httpLoading.error && (
         <ErrorMessage
-          showModal={httpError.error}
+          showModal={httpLoading.error}
+          message={httpLoading.message}
           modalHandler={onModalErrorHandler}
-          message={httpError.message}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          message={httpConfirm.message}
+          modalHandler={onModalConfirmHandler}
+          onClose={onModalConfirmHandler}
         />
       )}
     </Fragment>

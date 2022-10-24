@@ -3,7 +3,6 @@ import AllExcersice from "../Excersice/AllExcersice";
 import Membership from "../../components/Membership/Membership";
 import Home from "../Home/Home";
 import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
-import TypeExcersiceFormPage from "../TypeExcersice/TypeExcersiceFormPage";
 import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
 import AllAlumno from "../Alumno/AllAlumno";
 import AllDiet from "../Diet/AllDiet";
@@ -16,6 +15,7 @@ import AllUsers from "../Users/AllUsers";
 import AuthForm from "../../components/Auth/AuthForm";
 import { useContext } from "react";
 import AuthContext from "../../store/auth-context";
+import TypeExcersiceForm from "../../components/TypeExcersice/TypeExcersiceForm/TypeExcersiceForm";
 const Routes = () => {
   const authCtx = useContext(AuthContext);
   return (
@@ -42,7 +42,7 @@ const Routes = () => {
         {!authCtx.loggedIn && <Route to="/home" />}
       </Route>
       <Route path="/form-type-excersice" exact>
-        {authCtx.loggedIn && <TypeExcersiceFormPage />}
+        {authCtx.loggedIn && <TypeExcersiceForm />}
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/alumno" exact>
@@ -54,7 +54,8 @@ const Routes = () => {
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/diet" exact>
-        <AllDiet />
+        {authCtx.loggedIn && <AllDiet />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/form-diet" exact>
         {authCtx.loggedIn && <DietFormPage />}
@@ -69,10 +70,12 @@ const Routes = () => {
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/search-diet" exact>
-        <Searching typeSearching={"DIET"} />
+        {authCtx.loggedIn && <Searching typeSearching={"DIET"} />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/search-routine" exact>
-        <Searching typeSearching={"ROUTINE"} />
+        {authCtx.loggedIn && <Searching typeSearching={"ROUTINE"} />}
+        {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/users" exact>
         <AllUsers />

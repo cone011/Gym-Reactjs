@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import AuthContext from "../../../store/auth-context";
+import classes from "./Navbar.module.css";
 
 const NavbarUI = (props) => {
   const authCtx = useContext(AuthContext);
@@ -18,6 +19,7 @@ const NavbarUI = (props) => {
       bg="dark"
       variant="dark"
       onSelect={logOutHandler}
+      className={classes.navbar}
     >
       <Container>
         <Navbar.Brand href="/">Inicio</Navbar.Brand>
