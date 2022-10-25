@@ -35,7 +35,6 @@ const confirmReducer = (curConfirm, action) => {
 const TypeExcersiceForm = () => {
   const location = useLocation();
   const history = useHistory();
-  console.log(location);
   const { esNuevo, typeExcersiceObject } = location.state;
   const codeInputForm = useRef();
   const descriptionInputForm = useRef();

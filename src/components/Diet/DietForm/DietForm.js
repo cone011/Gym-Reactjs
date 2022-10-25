@@ -6,6 +6,8 @@ import {
   useReducer,
   useState,
 } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { SaveDieta } from "../../../lib/DietaApi";
 import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
 import classes from "./DietForm.module.css";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
@@ -15,6 +17,32 @@ import DietaDetailList from "../DietDetailList/DietDetailList";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 import { SearchList } from "../../../util/FindItem";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import LoadingForm from "../../UI/LoadingForm/LoadingForm";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
+
+const loadingReducer = (curLoading, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isLoading: true, error: false, message: action.message };
+    case "ERROR":
+      return { isLoading: false, error: true, message: action.message };
+    case "END":
+      return { ...curLoading, isLoading: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "END":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const dietaReducer = (curDieta, action) => {
   switch (action.type) {
@@ -69,8 +97,10 @@ const searchReducer = (curSearch, action) => {
   }
 };
 
-const DietaForm = (props) => {
-  const { dietData, esNuevo } = props;
+const DietaForm = () => {
+  const history = useHistory();
+  const location = useLocation();
+  const { dietData, esNuevo } = location.state;
   const [httpSearch, dispatchSearch] = useReducer(searchReducer, {
     isShowingSearch: false,
     error: false,
@@ -81,6 +111,15 @@ const DietaForm = (props) => {
     isLoading: false,
     isShowing: false,
     isError: false,
+    message: null,
+  });
+  const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
+    isLoading: false,
+    error: false,
+    message: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
     message: null,
   });
   const [listTrainner, SetTrainnerList] = useState([]);
@@ -119,64 +158,82 @@ const DietaForm = (props) => {
     dispatchDieta({ type: "CLOSED" });
   };
 
-  const dietFormHandler = (event) => {
-    event.preventDefault();
+  const dietFormHandler = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-    dispatchDieta({ type: "BEGIN" });
+      dispatchLoading({ type: "BEGIN", message: "GUARDANDO...." });
 
-    if (alumnoInputRef.current.value === 0) {
-      dispatchDieta({
-        type: "ERROR",
-        message: "No hay un alumno asignado a este registro",
-      });
-      return;
-    }
+      try {
+        if (alumnoInputRef.current.value === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "No hay un alumno asignado a este registro",
+          });
+          return;
+        }
 
-    if (trainnerInputRef.current.value === 0) {
-      dispatchDieta({
-        type: "ERROR",
-        message: "No se asigno un entrenador",
-      });
-      return;
-    }
+        if (trainnerInputRef.current.value === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "No se asigno un entrenador",
+          });
+          return;
+        }
 
-    if (dietData.length === 0 || dietData === null) {
-      dispatchDieta({
-        type: "ERROR",
-        message: "No hay detalles en este registro",
-      });
-      return;
-    }
+        if (dietData.length === 0 || dietData === null) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "No hay detalles en este registro",
+          });
+          return;
+        }
 
-    dispatchDieta({ type: "END" });
+        const trainnerSeleceted = SearchList(
+          listTrainner,
+          "IdTrainner",
+          trainnerInputRef.current.value
+        );
 
-    const trainnerSeleceted = SearchList(
-      listTrainner,
-      "IdTrainner",
-      trainnerInputRef.current.value
-    );
+        let sendDietData = {
+          IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
+          Alumno: httpSearch.alumnoDataSelected.Nombre,
+          FechaCarga: new Date(fechaInputRef.current.value)
+            .toISOString()
+            .substring(0, 10),
+          IdTrainner: trainnerSeleceted.IdTrainner,
+          Trainner: trainnerSeleceted.Nombre,
+          DietaDetalleList: dietData.dietaDetalleList,
+          esNuevo: esNuevo,
+        };
 
-    let sendDietData = {
-      IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
-      Alumno: httpSearch.alumnoDataSelected.Nombre,
-      FechaCarga: new Date(fechaInputRef.current.value)
-        .toISOString()
-        .substring(0, 10),
-      IdTrainner: trainnerSeleceted.IdTrainner,
-      Trainner: trainnerSeleceted.Nombre,
-      DietaDetalleList: dietData.dietaDetalleList,
-      esNuevo: esNuevo,
-    };
+        if (!esNuevo) {
+          sendDietData = {
+            ...sendDietData,
+            IdDieta: dietData.IdDieta,
+          };
+        }
 
-    if (!esNuevo) {
-      sendDietData = {
-        ...sendDietData,
-        IdDieta: dietData.IdDieta,
-      };
-    }
+        const dataReponse = await SaveDieta(sendDietData);
 
-    props.OnsaveDiet({ ...sendDietData });
-  };
+        if (dataReponse.message === "OK") {
+          dispatchLoading({ type: "END" });
+          dispatchConfirm({
+            type: "BEGIN",
+            message: "La dieta se persistio de forma correcta",
+          });
+        } else {
+          dispatchLoading({
+            type: "ERROR",
+            message: "La dieta no se pudo persistir de forma correcta",
+          });
+        }
+      } catch (err) {
+        dispatchLoading({ type: "ERROR", message: err.message });
+      }
+    },
+    [listTrainner, httpSearch, esNuevo, dietData]
+  );
 
   const onShowSearchAlumno = () => {
     dispatchSearch({ type: "BEGIN" });
@@ -189,6 +246,13 @@ const DietaForm = (props) => {
 
   const onSelectedTrainnerChanged = (valueChanged) => {
     trainnerInputRef.current.value = valueChanged.value;
+  };
+
+  const onConfirmModal = () => {
+    if (httpConfirm.isShowing) {
+      dispatchConfirm({ type: "END" });
+      history.push("/diet");
+    }
   };
 
   return (
@@ -267,6 +331,20 @@ const DietaForm = (props) => {
           showModal={httpSearch.isShowingSearch}
           modalHandler={modalShowHandler}
           onAlumnoSelectedValue={onAlumnoSelected}
+        />
+      )}
+      {httpLoading.isLoading && (
+        <LoadingForm
+          showModal={httpLoading.isLoading}
+          message={httpLoading.message}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          message={httpConfirm.message}
+          modalHandler={onConfirmModal}
+          onClose={onConfirmModal}
         />
       )}
     </Fragment>

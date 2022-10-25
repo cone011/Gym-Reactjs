@@ -1,6 +1,34 @@
 import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
 import classes from "./AlumnoForm.module.css";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+import LoadingForm from "../../UI/LoadingForm/LoadingForm";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
+
+const loadingReducer = (curLoading, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isLoading: true, error: false, message: action.message };
+    case "ERROR":
+      return { isLoading: false, error: true, message: action.message };
+    case "CLOSED":
+      return { ...curLoading, error: false };
+    case "END":
+      return { ...curLoading, isLoading: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
+
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "END":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se pudo realizar la accion");
+  }
+};
 
 const errorReducer = (curError, action) => {
   switch (action.type) {
@@ -24,6 +52,15 @@ const AlumnoForm = (props) => {
   const direccionInputRef = useRef();
   const telefonoInputRef = useRef();
   const emailInputRef = useRef();
+  const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
+    isLoading: false,
+    error: false,
+    message: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
+    message: null,
+  });
   const [httpError, dispatchError] = useReducer(errorReducer, {
     error: false,
     message: null,
@@ -45,7 +82,6 @@ const AlumnoForm = (props) => {
         .toISOString()
         .substring(0, 10);
     }
-    console.log(IdUsuario);
   }, [esNuevo, alumnoObject, IdUsuario]);
 
   useEffect(() => {

@@ -6,7 +6,6 @@ import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
 import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
 import AllAlumno from "../Alumno/AllAlumno";
 import AllDiet from "../Diet/AllDiet";
-import DietFormPage from "../Diet/DietFormPage";
 import RoutineFormPage from "../Routine/RoutineFormPage";
 import AllRoutine from "../Routine/AllRoutine";
 import Searching from "../../components/Search/Searching/Searching";
@@ -16,6 +15,7 @@ import AuthForm from "../../components/Auth/AuthForm";
 import { useContext } from "react";
 import AuthContext from "../../store/auth-context";
 import TypeExcersiceForm from "../../components/TypeExcersice/TypeExcersiceForm/TypeExcersiceForm";
+import DietaForm from "../../components/Diet/DietForm/DietForm";
 const Routes = () => {
   const authCtx = useContext(AuthContext);
   return (
@@ -58,7 +58,7 @@ const Routes = () => {
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/form-diet" exact>
-        {authCtx.loggedIn && <DietFormPage />}
+        {authCtx.loggedIn && <DietaForm />}
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/routine" exact>
