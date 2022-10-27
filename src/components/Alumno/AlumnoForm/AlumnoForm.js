@@ -1,4 +1,6 @@
 import { useRef, useEffect, useCallback, useReducer, Fragment } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { SaveAlumno } from "../../../lib/AlumnoApi";
 import classes from "./AlumnoForm.module.css";
 import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
 import LoadingForm from "../../UI/LoadingForm/LoadingForm";
@@ -30,21 +32,10 @@ const confirmReducer = (curConfirm, action) => {
   }
 };
 
-const errorReducer = (curError, action) => {
-  switch (action.type) {
-    case "BEGIN":
-      return { error: true, message: action.message };
-    case "CLOSED":
-      return { ...curError, error: false };
-    case "END":
-      return { ...curError, error: false };
-    default:
-      throw new Error("No se pudo realizar la accion");
-  }
-};
-
-const AlumnoForm = (props) => {
-  const { alumnoObject, esNuevo, IdUsuario } = props;
+const AlumnoForm = () => {
+  const history = useHistory();
+  const location = useLocation();
+  const { alumnoObject, esNuevo, IdUsuario } = location.state;
   const nameInputRef = useRef();
   const cedulaInputRef = useRef();
   const fechaNacInputRef = useRef();
@@ -59,10 +50,6 @@ const AlumnoForm = (props) => {
   });
   const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
     isShowing: false,
-    message: null,
-  });
-  const [httpError, dispatchError] = useReducer(errorReducer, {
-    error: false,
     message: null,
   });
 
@@ -82,69 +69,105 @@ const AlumnoForm = (props) => {
         .toISOString()
         .substring(0, 10);
     }
-  }, [esNuevo, alumnoObject, IdUsuario]);
+  }, [esNuevo, alumnoObject]);
 
   useEffect(() => {
     assigmentValues();
   }, [assigmentValues]);
 
   const modalHandler = () => {
-    dispatchError({ type: "CLOSED" });
+    if (httpLoading.error) {
+      dispatchLoading({ type: "CLOSED" });
+    }
   };
 
-  const alumnoSubmitHandler = (event) => {
-    event.preventDefault();
+  const alumnoSubmitHandler = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-    if (nameInputRef.current.value.trim().length === 0) {
-      dispatchError({ type: "BEGIN", message: "Favor cargue su nombre" });
-      return;
+      dispatchLoading({ type: "BEGIN", message: "SAVING......" });
+
+      try {
+        if (nameInputRef.current.value.trim().length === 0) {
+          dispatchLoading({ type: "ERROR", message: "Favor cargue su nombre" });
+          return;
+        }
+
+        if (cedulaInputRef.current.value.trim().length === 0) {
+          dispatchLoading({ type: "ERROR", message: "Favor cargue su cedula" });
+          return;
+        }
+
+        if (edadInputRef.current.value === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "Favor de cargar su edad",
+          });
+          return;
+        }
+
+        if (telefonoInputRef.current.value.trim().length === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "Favor cargar su numero de telefono",
+          });
+          return;
+        }
+
+        if (direccionInputRef.current.value.trim().length === 0) {
+          dispatchLoading({
+            type: "ERROR",
+            message: "Favor cargar la direccion",
+          });
+          return;
+        }
+        let sendDataObject = {
+          Cedula: cedulaInputRef.current.value,
+          Nombre: nameInputRef.current.value,
+          FechaNacimiento: fechaNacInputRef.current.value,
+          Edad: edadInputRef.current.value,
+          Direccion: direccionInputRef.current.value,
+          Telefono: telefonoInputRef.current.value,
+          Email: emailInputRef.current.value,
+          IdUsuario: IdUsuario,
+          esNuevo: esNuevo,
+        };
+
+        if (!esNuevo) {
+          sendDataObject = {
+            ...sendDataObject,
+            IdAlumno: alumnoObject.IdAlumno,
+          };
+        }
+
+        console.log(sendDataObject);
+
+        const dataResponse = await SaveAlumno(sendDataObject);
+
+        if (dataResponse.message === "OK") {
+          dispatchLoading({ type: "END" });
+          dispatchConfirm({
+            type: "BEGIN",
+            message: "El alumno fue persistido corrrectamente",
+          });
+        } else {
+          dispatchLoading({
+            type: "ERROR",
+            message: "El alumno no fue persistido correctamente",
+          });
+        }
+      } catch (err) {
+        dispatchLoading({ type: "ERROR", message: err.message });
+      }
+    },
+    [IdUsuario, esNuevo, alumnoObject]
+  );
+
+  const onConfirmHandler = () => {
+    if (httpConfirm.isShowing) {
+      dispatchConfirm({ type: "END" });
+      history.push("/alumno");
     }
-
-    if (cedulaInputRef.current.value.trim().length === 0) {
-      dispatchError({ type: "BEGIN", message: "Favor cargue su cedula" });
-      return;
-    }
-
-    if (edadInputRef.current.value === 0) {
-      dispatchError({ type: "BEGIN", message: "Favor de cargar su edad" });
-      return;
-    }
-
-    if (telefonoInputRef.current.value.trim().length === 0) {
-      dispatchError({
-        type: "BEGIN",
-        message: "Favor cargar su numero de telefono",
-      });
-      return;
-    }
-
-    if (direccionInputRef.current.value.trim().length === 0) {
-      dispatchError({ type: "BEGIN", message: "Favor cargar la direccion" });
-      return;
-    }
-
-    let sendDataObject = {
-      Cedula: cedulaInputRef.current.value,
-      Nombre: nameInputRef.current.value,
-      FechaNacimiento: fechaNacInputRef.current.value,
-      Edad: edadInputRef.current.value,
-      Direccion: direccionInputRef.current.value,
-      Telefono: telefonoInputRef.current.value,
-      Email: emailInputRef.current.value,
-      IdUsuario: IdUsuario,
-      esNuevo: esNuevo,
-    };
-
-    if (!esNuevo) {
-      sendDataObject = {
-        ...sendDataObject,
-        IdAlumno: alumnoObject.IdAlumno,
-      };
-    }
-
-    props.onSaveAlumnoHandler({
-      ...sendDataObject,
-    });
   };
 
   return (
@@ -195,11 +218,25 @@ const AlumnoForm = (props) => {
           </div>
         </form>
       </section>
-      {httpError.error && (
+      {httpLoading.error && (
         <ErrorMessage
-          showModal={httpError.error}
-          message={httpError.message}
+          showModal={httpLoading.error}
+          message={httpLoading.message}
           modalHandler={modalHandler}
+        />
+      )}
+      {httpLoading.isLoading && (
+        <LoadingForm
+          showModal={httpLoading.isLoading}
+          message={httpLoading.message}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          message={httpConfirm.message}
+          modalHandler={onConfirmHandler}
+          onClose={onConfirmHandler}
         />
       )}
     </Fragment>

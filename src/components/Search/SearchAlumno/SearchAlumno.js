@@ -1,4 +1,4 @@
-import { useRef, useReducer, useState } from "react";
+import { useRef, useReducer, useState, useCallback } from "react";
 import classes from "./SearchAlumno.module.css";
 import LoadingSpinner from "../../UI/LoadingSpinner/LoadingSpinner";
 import { GetSearchAlumno } from "../../../lib/AlumnoApi";
@@ -29,21 +29,25 @@ const SearchAlumno = (props) => {
     isShowing: false,
   });
 
-  const onSearchAlumnoHandler = async () => {
-    if (searchValueInputRef.current.value === 0) {
-      return;
-    }
-
+  const onSearchAlumnoHandler = useCallback(async () => {
     dispatchHttp({ type: "SEND" });
 
-    const searchValue = searchValueInputRef.current.value;
+    try {
+      if (searchValueInputRef.current.value === 0) {
+        return;
+      }
 
-    const result = await GetSearchAlumno(searchValue);
+      const searchValue = searchValueInputRef.current.value;
 
-    setListSearch(result);
+      const result = await GetSearchAlumno(searchValue);
 
-    dispatchHttp({ type: "RESPONSE" });
-  };
+      setListSearch(result);
+
+      dispatchHttp({ type: "RESPONSE" });
+    } catch (err) {
+      dispatchHttp({ type: "ERROR" });
+    }
+  }, []);
 
   const valueSelected = (alumnoData) => {
     props.onAlumnoSelectedValue({ ...alumnoData });
@@ -89,6 +93,11 @@ const SearchAlumno = (props) => {
               isSearching={true}
               onValueSelected={valueSelected}
             />
+          )}
+          {httpState.error && (
+            <div className="centered">
+              <h1>Error</h1>
+            </div>
           )}
         </section>
       </Modal.Body>

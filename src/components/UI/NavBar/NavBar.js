@@ -20,6 +20,7 @@ const NavbarUI = (props) => {
       variant="dark"
       onSelect={logOutHandler}
       className={classes.navbar}
+      sticky="top"
     >
       <Container>
         <Navbar.Brand href="/">Inicio</Navbar.Brand>

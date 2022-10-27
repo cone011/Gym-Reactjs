@@ -6,16 +6,16 @@ import AllTypeExcersice from "../TypeExcersice/AllTypeExcersice";
 import ExcersiceFormPage from "../Excersice/ExcersiceFormPage";
 import AllAlumno from "../Alumno/AllAlumno";
 import AllDiet from "../Diet/AllDiet";
-import RoutineFormPage from "../Routine/RoutineFormPage";
 import AllRoutine from "../Routine/AllRoutine";
 import Searching from "../../components/Search/Searching/Searching";
-import AlumnoFormPage from "../Alumno/AlumnoFormPage";
 import AllUsers from "../Users/AllUsers";
 import AuthForm from "../../components/Auth/AuthForm";
 import { useContext } from "react";
 import AuthContext from "../../store/auth-context";
 import TypeExcersiceForm from "../../components/TypeExcersice/TypeExcersiceForm/TypeExcersiceForm";
 import DietaForm from "../../components/Diet/DietForm/DietForm";
+import AlumnoForm from "../../components/Alumno/AlumnoForm/AlumnoForm";
+import RoutineForm from "../../components/Routine/RoutineForm/RoutineForm";
 const Routes = () => {
   const authCtx = useContext(AuthContext);
   return (
@@ -50,7 +50,7 @@ const Routes = () => {
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/form-alumno" exact>
-        {authCtx.loggedIn && <AlumnoFormPage />}
+        {authCtx.loggedIn && <AlumnoForm />}
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/diet" exact>
@@ -66,7 +66,7 @@ const Routes = () => {
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/form-routine" exact>
-        {authCtx.loggedIn && <RoutineFormPage />}
+        {authCtx.loggedIn && <RoutineForm />}
         {!authCtx.loggedIn && <Redirect to="/home" />}
       </Route>
       <Route path="/search-diet" exact>

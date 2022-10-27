@@ -97,7 +97,7 @@ const DietList = (props) => {
 
   const editDietButtonHandler = (eventValue) => {
     history.push({
-      pathname: "/edit-diet",
+      pathname: "/form-diet",
       state: {
         esNuevo: false,
         dietData: {
@@ -119,7 +119,7 @@ const DietList = (props) => {
 
   const newButtonHandler = () => {
     history.push({
-      pathname: "/new-diet",
+      pathname: "/form-diet",
       state: {
         esNuevo: true,
         dietData: {

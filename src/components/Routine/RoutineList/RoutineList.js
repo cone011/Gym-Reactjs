@@ -20,6 +20,7 @@ import DeleteMessage from "../../UI/DeleteMessage/DeleteMessage";
 import LoadingForm from "../../UI/LoadingForm/LoadingForm";
 import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
 import { DeleteRoutine } from "../../../lib/RoutineApi";
+import { GetObjectByIdRutina } from "../../../lib/RoutineDetailApi";
 
 const loadingReducer = (curLoading, action) => {
   switch (action.type) {
@@ -154,6 +155,26 @@ const RoutineList = (props) => {
     dispatchConfirm({ type: "CLOSED" });
   };
 
+  const showRoutineDetail = useCallback(async (eventValue) => {
+    dispatchLoading({ type: "BEGIN", message: "Obteniendo los datos....." });
+    try {
+      const dataReponse = await GetObjectByIdRutina(
+        eventValue.row.data.IdRutina
+      );
+      if (dataReponse.length > 0) {
+        dispatchLoading({ type: "END" });
+        console.log(dataReponse);
+      } else {
+        dispatchLoading({
+          type: "ERROR",
+          message: "No se encontraron resultados con estos parametros",
+        });
+      }
+    } catch (err) {
+      dispatchLoading({ type: "ERROR", message: err.message });
+    }
+  }, []);
+
   return (
     <Fragment>
       <div>
@@ -177,7 +198,7 @@ const RoutineList = (props) => {
             <Column dataField="Alumno" caption="Alumno" dataType="string" />
             <Column dataField="Trainner" caption="Trainner" dataType="string" />
             <Column dataField="Fecha" caption="Fecha" dataType="date" />
-            {isEditable && (
+            {isEditable ? (
               <Column type="buttons">
                 <Button
                   cssClass="btn"
@@ -188,6 +209,16 @@ const RoutineList = (props) => {
                 </Button>
                 <Button cssClass="btn" name="eliminar">
                   Eliminar
+                </Button>
+              </Column>
+            ) : (
+              <Column type="buttons">
+                <Button
+                  cssClass="btn"
+                  name="Ver Detalle"
+                  onClick={showRoutineDetail}
+                >
+                  Detalle
                 </Button>
               </Column>
             )}

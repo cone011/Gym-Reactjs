@@ -6,6 +6,8 @@ import {
   Fragment,
   useRef,
 } from "react";
+import { useHistory, useLocation } from "react-router-dom";
+import { SaveRoutine } from "../../../lib/RoutineApi";
 import classes from "./RoutineForm.module.css";
 import SearchAlumno from "../../Search/SearchAlumno/SearchAlumno";
 import { GetAllTrainner } from "../../../lib/TrainnerApi";
@@ -13,6 +15,35 @@ import { GetObjectByIdRutina } from "../../../lib/RoutineDetailApi";
 import { SearchList } from "../../../util/FindItem";
 import { SelectBox } from "devextreme-react/select-box";
 import RoutineDetailList from "../RoutineDetailList/RoutineDetailList";
+import LoadingForm from "../../UI/LoadingForm/LoadingForm";
+import ShowConfirmMessage from "../../UI/ShowConfirmMessage/ShowConfirmMessage";
+import ErrorMessage from "../../UI/ErrorMessage/ErrorMessage";
+
+const loadingReducer = (curLoading, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isLoading: true, error: false, message: action.message };
+    case "ERROR":
+      return { isLoading: false, error: true, message: action.message };
+    case "CLOSED":
+      return { ...curLoading, error: true };
+    case "END":
+      return { ...curLoading, isLoading: false };
+    default:
+      throw new Error("No se puede realizar la accion que no existe");
+  }
+};
+
+const confirmReducer = (curConfirm, action) => {
+  switch (action.type) {
+    case "BEGIN":
+      return { isShowing: true, message: action.message };
+    case "END":
+      return { ...curConfirm, isShowing: false };
+    default:
+      throw new Error("No se puede realizar la accion que no existe");
+  }
+};
 
 const searchReducer = (curSearch, action) => {
   switch (action.type) {
@@ -42,8 +73,10 @@ const searchReducer = (curSearch, action) => {
   }
 };
 
-const RoutineForm = (props) => {
-  const { routineObject, esNuevo } = props;
+const RoutineForm = () => {
+  const history = useHistory();
+  const location = useLocation();
+  const { routineObject, esNuevo } = location.state;
   const [listTrainner, SetTrainnerList] = useState([]);
   const [httpSearch, dispatchSearch] = useReducer(searchReducer, {
     isLoading: false,
@@ -54,6 +87,15 @@ const RoutineForm = (props) => {
   const fechaInputRef = useRef();
   const alumnoInputRef = useRef();
   const trainnerInputRef = useRef();
+  const [httpLoading, dispatchLoading] = useReducer(loadingReducer, {
+    sLoading: false,
+    error: false,
+    message: null,
+  });
+  const [httpConfirm, dispatchConfirm] = useReducer(confirmReducer, {
+    isShowing: false,
+    message: null,
+  });
 
   const assigmentValue = useCallback(async () => {
     if (!esNuevo) {
@@ -97,35 +139,70 @@ const RoutineForm = (props) => {
     trainnerInputRef.current.value = valueChanged.value;
   };
 
-  const onSubmitFormHandler = (event) => {
-    event.preventDefault();
+  const onSubmitFormHandler = useCallback(
+    async (event) => {
+      event.preventDefault();
 
-    const trainnerSeleceted = SearchList(
-      listTrainner,
-      "IdTrainner",
-      trainnerInputRef.current.value
-    );
+      dispatchLoading({ type: "BEGIN", message: "SAVING...." });
 
-    let sendDietData = {
-      IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
-      Alumno: httpSearch.alumnoDataSelected.Nombre,
-      Fecha: new Date(fechaInputRef.current.value)
-        .toISOString()
-        .substring(0, 10),
-      IdTrainner: trainnerSeleceted.IdTrainner,
-      Trainner: trainnerSeleceted.Nombre,
-      RutinaDetalle: routineObject.routineDetalleList,
-      esNuevo: esNuevo,
-    };
+      try {
+        const trainnerSeleceted = SearchList(
+          listTrainner,
+          "IdTrainner",
+          trainnerInputRef.current.value
+        );
 
-    if (!esNuevo) {
-      sendDietData = {
-        ...sendDietData,
-        IdRutina: routineObject.IdRutina,
-      };
+        let sendRoutineData = {
+          IdAlumno: httpSearch.alumnoDataSelected.IdAlumno,
+          Alumno: httpSearch.alumnoDataSelected.Nombre,
+          Fecha: new Date(fechaInputRef.current.value)
+            .toISOString()
+            .substring(0, 10),
+          IdTrainner: trainnerSeleceted.IdTrainner,
+          Trainner: trainnerSeleceted.Nombre,
+          RutinaDetalle: routineObject.routineDetalleList,
+          esNuevo: esNuevo,
+        };
+
+        if (!esNuevo) {
+          sendRoutineData = {
+            ...sendRoutineData,
+            IdRutina: routineObject.IdRutina,
+          };
+        }
+
+        const dataReponse = await SaveRoutine(sendRoutineData);
+
+        if (dataReponse.message === "OK") {
+          dispatchLoading({ type: "END" });
+          dispatchConfirm({
+            type: "BEGIN",
+            message: "Se persistio la rutina correctamente",
+          });
+        } else {
+          dispatchConfirm({
+            type: "ERROR",
+            message: "No se pudo  persistir la rutina",
+          });
+        }
+      } catch (err) {
+        dispatchLoading({ type: "ERROR", message: err.message });
+      }
+    },
+    [httpSearch, listTrainner, esNuevo, routineObject]
+  );
+
+  const onErrorHandler = () => {
+    if (httpLoading.error) {
+      dispatchLoading({ type: "CLOSED" });
     }
+  };
 
-    props.onSaveRoutine({ ...sendDietData });
+  const onConfirmHandler = () => {
+    if (httpConfirm.isShowing) {
+      dispatchConfirm({ type: "END" });
+      history.push("/routine");
+    }
   };
 
   return (
@@ -190,6 +267,27 @@ const RoutineForm = (props) => {
           showModal={httpSearch.isShowingSearch}
           modalHandler={modalShowHandler}
           onAlumnoSelectedValue={onAlumnoSelected}
+        />
+      )}
+      {httpLoading.isLoading && (
+        <LoadingForm
+          showModal={httpLoading.isLoading}
+          message={httpLoading.message}
+        />
+      )}
+      {httpConfirm.isShowing && (
+        <ShowConfirmMessage
+          showModal={httpConfirm.isShowing}
+          message={httpConfirm.message}
+          modalHandler={onConfirmHandler}
+          onclose={onConfirmHandler}
+        />
+      )}
+      {httpLoading.error && (
+        <ErrorMessage
+          showModal={httpLoading.error}
+          message={httpLoading.message}
+          modalHandler={onErrorHandler}
         />
       )}
     </Fragment>

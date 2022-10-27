@@ -1,11 +1,13 @@
 import {
   Fragment,
   useCallback,
+  useContext,
   useEffect,
   useReducer,
   useRef,
   useState,
 } from "react";
+import AuthContext from "../../../store/auth-context";
 import classes from "./AlumnoList.module.css";
 import DataGrid, {
   Column,
@@ -65,6 +67,7 @@ const confirmReducer = (curConfirm, action) => {
 };
 
 const AlumnoList = (props) => {
+  const authCtx = useContext(AuthContext);
   const { isSearching, alumnoData } = props;
   const [ListAlumno, SetListAlumno] = useState([]);
   const dataRef = useRef();
@@ -93,10 +96,12 @@ const AlumnoList = (props) => {
   }, [assigmentValues]);
 
   const newButtonHandler = () => {
+    console.log(authCtx.userData);
     history.push({
       pathname: "/form-alumno",
       state: {
         esNuevo: true,
+        IdUsuario: authCtx.userData.IdUsuario,
         alumnoObject: {
           IdAlumno: null,
           Nombre: null,
@@ -116,6 +121,7 @@ const AlumnoList = (props) => {
       pathname: "/form-alumno",
       state: {
         esNuevo: false,
+        IdUsuario: authCtx.userData.IdUsuario,
         alumnoObject: {
           ...eventValue.row.data,
         },

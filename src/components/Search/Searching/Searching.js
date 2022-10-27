@@ -128,13 +128,6 @@ const Searching = (props) => {
   const assigmentValues = useCallback(async () => {
     switch (typeSearching) {
       case "DIET":
-        dispatchSearching({
-          type: "BEGIN",
-          typeSearching: typeSearching,
-          showFilter: true,
-        });
-        loadedTrainner();
-        break;
       case "ROUTINE":
         dispatchSearching({
           type: "BEGIN",
@@ -149,7 +142,7 @@ const Searching = (props) => {
       default:
         throw new Error("No se pudo realizar la accion");
     }
-  }, [typeSearching, dispatchSearching, loadedTrainner]);
+  }, [typeSearching, loadedTrainner]);
 
   useEffect(() => {
     assigmentValues();
